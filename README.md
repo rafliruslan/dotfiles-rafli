@@ -124,14 +124,12 @@ dotfiles-rafli/
 ### SketchyBar
 - **Lua Configuration**: Modular setup with separate item configurations
 - **System Information**: CPU, memory, battery, network status
-- **Workspace Integration**: Integration with AeroSpace/Yabai
+- **Workspace Integration**: Integration with AeroSpace
 - **Media Controls**: Current playing media information
 - **Custom Items**: Calendar, weather, and custom widgets
 
 ### Window Management
-- **AeroSpace**: Modern tiling with automatic workspace management
-- **Yabai**: Advanced window manipulation and layouts
-- **skhd**: Keyboard shortcuts for window operations
+- **AeroSpace**: Modern tiling window manager with automatic workspace management and native macOS integration
 
 ## 🔧 Customization
 
@@ -150,9 +148,8 @@ All configurations are modular and can be customized:
 ## 🚨 Important Notes
 
 ### Permissions Required
-- **Accessibility**: Yabai and skhd require accessibility permissions
+- **Accessibility**: AeroSpace requires accessibility permissions for window management
 - **Screen Recording**: Some features may require screen recording permissions
-- **SIP**: Full yabai functionality requires disabling System Integrity Protection
 
 ### First-Time Setup
 1. Grant necessary permissions in System Preferences > Security & Privacy
@@ -194,12 +191,12 @@ tmux source ~/.tmux.conf
 
 **SketchyBar not starting**
 ```bash
-brew services restart sketchybar
+brew services restart felixkratz/formulae/sketchybar
 ```
 
-**Yabai not working**
-- Check accessibility permissions in System Preferences
-- For full functionality, consider disabling SIP (advanced users only)
+**AeroSpace not working**
+- Check accessibility permissions in System Preferences > Security & Privacy > Accessibility
+- Ensure AeroSpace is in the list and enabled
 
 **Neovim LSP not working**
 - Ensure language servers are installed via Mason
@@ -229,7 +226,6 @@ This dotfiles repository is available under the MIT License. Feel free to use, m
 - [tmux](https://github.com/tmux/tmux) - Terminal multiplexer
 - [SketchyBar](https://github.com/FelixKratz/SketchyBar) - macOS status bar
 - [AeroSpace](https://github.com/nikitabobko/AeroSpace) - Tiling window manager
-- [Yabai](https://github.com/koekeishiya/yabai) - Window management
 - [Powerlevel10k](https://github.com/romkatv/powerlevel10k) - Zsh theme
 
 ---
