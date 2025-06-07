@@ -29,6 +29,9 @@ palette = 15=#24EAF7
 font-family = "IBM Plex Mono"
 font-size = 19
 
+# Terminal settings  
+term = xterm-256color
+
 # Window settings
 window-decoration = false
 background-opacity = 0.95
