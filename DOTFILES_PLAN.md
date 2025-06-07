@@ -51,8 +51,6 @@ Based on system scan performed on 6/7/2025, the following configuration files an
 
 ### **Window Manager Configurations**
 - `/Users/me/.config/aerospace/aerospace.toml` - AeroSpace window manager
-- `/Users/me/.config/yabai/yabairc` - Yabai tiling window manager
-- `/Users/me/.config/skhd/skhdrc` - Simple hotkey daemon
 
 ### **Other Application Configurations**
 - `/Users/me/.config/raycast/` - Raycast launcher configuration
@@ -71,8 +69,6 @@ dotfiles-rafli/
 │   ├── sketchybar/              # SketchyBar status bar
 │   ├── ghostty/                 # Ghostty terminal
 │   ├── aerospace/               # AeroSpace window manager
-│   ├── yabai/                   # Yabai window manager
-│   ├── skhd/                    # Hotkey daemon
 │   └── raycast/                 # Raycast launcher
 ├── tmux/
 │   ├── .tmux.conf              # Main tmux config
@@ -98,35 +94,37 @@ dotfiles-rafli/
 3. Exclude sensitive files (SSH keys, git credentials, bash history)
 4. Create proper .gitignore to prevent accidental commits of sensitive data
 
-### **Phase 2: Installation Automation**
-1. Create symlink installation script (`scripts/install.sh`)
+### **Phase 2: Installation Automation** ✅ COMPLETED
+1. ✅ Create symlink installation script (`scripts/install.sh`)
    - Automated symlinking of all configuration files
    - Cross-platform compatibility considerations
    - Error handling and validation
-2. Add backup functionality for existing configs (`scripts/backup.sh`)
+2. ✅ Add backup functionality for existing configs (`scripts/backup.sh`)
    - Backup existing dotfiles before installation
    - Restore functionality if needed
-3. Add macOS-specific setup (`scripts/setup-macos.sh`)
+3. ✅ Add macOS-specific setup (`scripts/setup-macos.sh`)
    - Homebrew package installation for all applications
    - Application-specific setup commands
    - System preferences configuration
-4. Create Homebrew bundle file (`Brewfile`)
+4. ✅ Create Homebrew bundle file (`Brewfile`)
    - List all required applications and dependencies
    - Include formulae, casks, and mas applications
    - Enable one-command installation of all tools
+   - Fixed deprecated packages (exa → eza)
+   - Added missing dependencies (zoxide, SketchyBar)
 
-### **Phase 3: Documentation & Git**
-1. Create comprehensive README with setup instructions
+### **Phase 3: Documentation & Git** ✅ COMPLETED
+1. ✅ Create comprehensive README with setup instructions
    - Prerequisites and Homebrew installation
    - Brewfile usage for installing applications
    - Configuration installation steps
    - Customization guide
    - Troubleshooting section
-2. Initialize git repository with proper .gitignore
+2. ✅ Initialize git repository with proper .gitignore
    - Exclude system-specific files
    - Exclude sensitive information
    - Include development artifacts appropriately
-3. Push to GitHub (rafliruslan)
+3. ✅ Push to GitHub (rafliruslan)
    - Set up repository on GitHub
    - Configure appropriate repository settings
    - Add repository description and topics
@@ -174,14 +172,20 @@ dotfiles-rafli/
 - Public configuration files
 - Application settings (after review)
 
-## Next Steps
+## Implementation Status
 
-1. **Review and approve this plan**
-2. **Execute Phase 1: Repository Setup**
-3. **Execute Phase 2: Installation Automation**
-4. **Execute Phase 3: Documentation & Git**
-5. **Test installation on clean system**
-6. **Iterate and improve based on usage**
+1. ✅ **Repository Setup** - Complete
+2. ✅ **Installation Automation** - Complete with improvements
+3. ✅ **Documentation & Git** - Complete
+4. ✅ **Installation Testing** - Successfully tested and validated
+5. 🔄 **Ongoing Improvements** - Continuous refinement based on usage
+
+## Recent Updates
+
+- Removed yabai and skhd configurations (simplified to AeroSpace-only)
+- Fixed Brewfile dependencies (exa → eza, added zoxide and SketchyBar)
+- Tested complete installation process
+- Validated all components working correctly
 
 ## Notes
 
