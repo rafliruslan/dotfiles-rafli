@@ -18,8 +18,6 @@ brew "zsh-syntax-highlighting"
 
 # Window management
 cask "nikitabobko/tap/aerospace"
-brew "koekeishiya/formulae/yabai"
-brew "koekeishiya/formulae/skhd"
 
 # Applications
 cask "ghostty"

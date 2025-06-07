@@ -50,22 +50,10 @@ else
     echo -e "${YELLOW}Brewfile not found, skipping package installation.${NC}"
 fi
 
-# Setup yabai (requires SIP to be disabled for some features)
-if command_exists yabai; then
-    echo -e "${GREEN}Setting up yabai...${NC}"
-    yabai --install-sa
-    sudo yabai --load-sa
-    
-    # Start yabai service
-    brew services start yabai
-    echo -e "${YELLOW}Note: For full yabai functionality, you may need to disable SIP.${NC}"
-    echo -e "${YELLOW}See: https://github.com/koekeishiya/yabai/wiki/Disabling-System-Integrity-Protection${NC}"
-fi
-
-# Setup skhd
-if command_exists skhd; then
-    echo -e "${GREEN}Setting up skhd...${NC}"
-    brew services start skhd
+# Setup AeroSpace
+if command_exists aerospace; then
+    echo -e "${GREEN}Setting up AeroSpace...${NC}"
+    echo -e "${YELLOW}Note: You may need to grant accessibility permissions to AeroSpace in System Preferences.${NC}"
 fi
 
 # Setup SketchyBar (manual installation if not available via Homebrew)
@@ -118,4 +106,4 @@ killall Finder
 
 echo -e "${GREEN}macOS setup completed!${NC}"
 echo -e "${YELLOW}Some changes may require a logout/restart to take effect.${NC}"
-echo -e "${YELLOW}Don't forget to configure accessibility permissions for yabai and skhd in System Preferences.${NC}"
+echo -e "${YELLOW}Don't forget to configure accessibility permissions for AeroSpace in System Preferences.${NC}"
