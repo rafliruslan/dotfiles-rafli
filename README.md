@@ -27,7 +27,7 @@ brew bundle install
 ### **Core Development Tools**
 - **Neovim** - Modern Vim-based editor with extensive Lua configuration
 - **tmux** - Terminal multiplexer with plugin ecosystem
-- **Zsh** - Enhanced shell with Powerlevel10k theme
+- **Zsh** - Enhanced shell with Powerlevel10k theme, eza (better ls), and zoxide (better cd)
 
 ### **Window Management**
 - **AeroSpace** - Modern tiling window manager
