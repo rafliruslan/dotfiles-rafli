@@ -2,9 +2,9 @@
 # Install with: brew bundle install
 
 # Taps
-tap "homebrew/bundle"
 tap "homebrew/services"
 tap "nikitabobko/tap"
+tap "felixkratz/formulae"
 
 # Core development tools
 brew "neovim"
@@ -23,8 +23,8 @@ cask "nikitabobko/tap/aerospace"
 cask "ghostty"
 cask "raycast"
 
-# SketchyBar (if available via Homebrew, otherwise manual install)
-# Note: SketchyBar may need to be installed manually from GitHub
+# SketchyBar status bar
+brew "felixkratz/formulae/sketchybar"
 
 # Additional useful tools for development
 brew "git"
@@ -32,8 +32,9 @@ brew "gh"
 brew "ripgrep"
 brew "fd"
 brew "bat"
-brew "exa"
+brew "eza"
 brew "fzf"
+brew "zoxide"
 
 # Language servers and formatters (for Neovim)
 brew "lua-language-server"
