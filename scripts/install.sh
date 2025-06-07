@@ -58,14 +58,6 @@ create_symlink "$DOTFILES_DIR/config/ghostty" "$HOME/.config/ghostty"
 echo -e "${GREEN}Installing AeroSpace configuration...${NC}"
 create_symlink "$DOTFILES_DIR/config/aerospace" "$HOME/.config/aerospace"
 
-# Install Yabai configuration
-echo -e "${GREEN}Installing Yabai configuration...${NC}"
-create_symlink "$DOTFILES_DIR/config/yabai" "$HOME/.config/yabai"
-
-# Install skhd configuration
-echo -e "${GREEN}Installing skhd configuration...${NC}"
-create_symlink "$DOTFILES_DIR/config/skhd" "$HOME/.config/skhd"
-
 # Install Raycast configuration
 echo -e "${GREEN}Installing Raycast configuration...${NC}"
 create_symlink "$DOTFILES_DIR/config/raycast" "$HOME/.config/raycast"
