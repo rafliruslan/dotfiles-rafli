@@ -202,6 +202,15 @@ brew services restart felixkratz/formulae/sketchybar
 - Ensure language servers are installed via Mason
 - Check `:LspInfo` for status
 
+**Telescope FZF extension errors**
+```bash
+# If you see "fzf extension doesn't exist" errors in Lazy.nvim:
+make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim clean
+make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim
+
+# Then restart Neovim or run :Lazy reload telescope.nvim
+```
+
 ### Getting Help
 
 1. Check the [detailed plan](DOTFILES_PLAN.md) for implementation details

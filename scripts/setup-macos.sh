@@ -80,6 +80,21 @@ if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     echo -e "${YELLOW}Run 'tmux source ~/.tmux.conf' and then 'prefix + I' to install tmux plugins.${NC}"
 fi
 
+# Compile telescope-fzf-native after Neovim plugins are installed
+TELESCOPE_FZF_PATH="$HOME/.local/share/nvim/lazy/telescope-fzf-native.nvim"
+if [[ -d "$TELESCOPE_FZF_PATH" ]]; then
+    echo -e "${GREEN}Compiling telescope-fzf-native...${NC}"
+    make -C "$TELESCOPE_FZF_PATH" clean 2>/dev/null || true
+    make -C "$TELESCOPE_FZF_PATH"
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}telescope-fzf-native compiled successfully.${NC}"
+    else
+        echo -e "${YELLOW}Warning: Failed to compile telescope-fzf-native. You may need to run 'make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim' manually.${NC}"
+    fi
+else
+    echo -e "${YELLOW}telescope-fzf-native not found. Install Neovim plugins first, then run this script again.${NC}"
+fi
+
 # Configure macOS defaults
 echo -e "${GREEN}Configuring macOS defaults...${NC}"
 
