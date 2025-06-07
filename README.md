@@ -153,7 +153,8 @@ All configurations are modular and can be customized:
 
 ### First-Time Setup
 1. Grant necessary permissions in System Preferences > Security & Privacy
-2. Install tmux plugins: `tmux source ~/.tmux.conf` then `prefix + I`
+2. tmux plugins are installed automatically during setup
+   - If needed manually: `tmux source ~/.tmux.conf` then `prefix + I`
 3. Restart terminal applications after installation
 4. Some configurations may require a logout/restart
 
@@ -185,8 +186,14 @@ cd ~/.dotfiles-backup-YYYYMMDD_HHMMSS
 
 **tmux plugins not loading**
 ```bash
+# If TPM is missing, install it first:
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# Then reload configuration and install plugins:
 tmux source ~/.tmux.conf
-# Then press prefix + I to install plugins
+~/.tmux/plugins/tpm/scripts/install_plugins.sh
+
+# Or manually with prefix + I in tmux session
 ```
 
 **SketchyBar not starting**
