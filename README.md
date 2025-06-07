@@ -31,8 +31,6 @@ brew bundle install
 
 ### **Window Management**
 - **AeroSpace** - Modern tiling window manager
-- **Yabai** - Advanced window management
-- **skhd** - Hotkey daemon for window management
 
 ### **System Enhancement**
 - **SketchyBar** - Customizable status bar
@@ -87,8 +85,6 @@ dotfiles-rafli/
 │   ├── sketchybar/              # SketchyBar status bar
 │   ├── ghostty/                 # Ghostty terminal
 │   ├── aerospace/               # AeroSpace window manager
-│   ├── yabai/                   # Yabai window manager
-│   ├── skhd/                    # Hotkey daemon
 │   └── raycast/                 # Raycast launcher
 ├── tmux/
 │   ├── .tmux.conf              # Main tmux config
