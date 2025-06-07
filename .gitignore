@@ -1,0 +1,79 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Neovim
+config/nvim/lazy-lock.json
+config/nvim/.luarc.json
+config/nvim/after/queries/
+
+# tmux plugins (managed by TPM)
+tmux/plugins/*/
+!tmux/plugins/.gitkeep
+
+# Shell history and cache
+.zsh_history
+.bash_history
+.zcompdump*
+
+# Raycast sensitive data
+config/raycast/commands/
+config/raycast/extensions/
+config/raycast/quicklinks/
+
+# Backup files
+*.backup
+*.backup.*
+*~
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.swp
+.swo
+
+# Local environment files
+.env
+.env.local
+
+# SketchyBar compiled helpers (if any)
+config/sketchybar/helpers/*
+!config/sketchybar/helpers/.gitkeep
+
+# Personal sensitive data
+*password*
+*secret*
+*key*
+*token*
+*credential*
+
+# System-specific files that shouldn't be shared
+*.local
+*.private
+
+# Lock files
+*.lock
