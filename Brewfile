@@ -9,12 +9,15 @@ tap "felixkratz/formulae"
 # Core development tools
 brew "neovim"
 brew "tmux"
-brew "zsh"
 
 # Terminal and shell enhancements
 brew "powerlevel10k"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
+brew "thefuck"
+
+# Fonts
+cask "font-meslo-lg-nerd-font"
 
 # Window management
 cask "nikitabobko/tap/aerospace"
@@ -35,11 +38,6 @@ brew "bat"
 brew "eza"
 brew "fzf"
 brew "zoxide"
-
-# Language servers and formatters (for Neovim)
-brew "lua-language-server"
-brew "stylua"
-brew "tree-sitter"
 
 # Optional: Additional development tools
 # Uncomment as needed
