@@ -29,13 +29,20 @@ config/nvim/.luarc.json
 config/nvim/after/queries/
 
 # tmux plugins (managed by TPM)
-tmux/plugins/*/
-!tmux/plugins/.gitkeep
+config/tmux/plugins/*/
 
 # Shell history and cache
 .zsh_history
 .bash_history
 .zcompdump*
+
+# Configs with sensitive/auth data
+config/gh/
+config/git/
+config/composer/
+
+# TheFuck cache
+config/thefuck/__pycache__/
 
 # Raycast sensitive data
 config/raycast/commands/
