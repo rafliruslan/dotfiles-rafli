@@ -43,9 +43,11 @@ backup_item "$HOME/.config/ghostty" "$BACKUP_DIR/config/ghostty"
 backup_item "$HOME/.config/aerospace" "$BACKUP_DIR/config/aerospace"
 backup_item "$HOME/.config/raycast" "$BACKUP_DIR/config/raycast"
 
-# tmux configurations
-backup_item "$HOME/.tmux.conf" "$BACKUP_DIR/tmux/.tmux.conf"
-backup_item "$HOME/.tmux" "$BACKUP_DIR/tmux/.tmux"
+# tmux configuration
+backup_item "$HOME/.config/tmux" "$BACKUP_DIR/config/tmux"
+
+# TheFuck configuration
+backup_item "$HOME/.config/thefuck" "$BACKUP_DIR/config/thefuck"
 
 # Shell configurations
 backup_item "$HOME/.zshrc" "$BACKUP_DIR/shell/.zshrc"
@@ -87,8 +89,8 @@ restore_item "$BACKUP_DIR/config/sketchybar" "$HOME/.config/sketchybar"
 restore_item "$BACKUP_DIR/config/ghostty" "$HOME/.config/ghostty"
 restore_item "$BACKUP_DIR/config/aerospace" "$HOME/.config/aerospace"
 restore_item "$BACKUP_DIR/config/raycast" "$HOME/.config/raycast"
-restore_item "$BACKUP_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
-restore_item "$BACKUP_DIR/tmux/.tmux" "$HOME/.tmux"
+restore_item "$BACKUP_DIR/config/tmux" "$HOME/.config/tmux"
+restore_item "$BACKUP_DIR/config/thefuck" "$HOME/.config/thefuck"
 restore_item "$BACKUP_DIR/shell/.zshrc" "$HOME/.zshrc"
 restore_item "$BACKUP_DIR/shell/.zprofile" "$HOME/.zprofile"
 restore_item "$BACKUP_DIR/shell/.p10k.zsh" "$HOME/.p10k.zsh"

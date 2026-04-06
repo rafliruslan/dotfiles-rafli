@@ -74,21 +74,22 @@ if command_exists sketchybar; then
 fi
 
 # Setup tmux plugin manager
-if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+if [[ ! -d "$HOME/.config/tmux/plugins/tpm" ]]; then
     echo -e "${GREEN}Installing tmux plugin manager (TPM)...${NC}"
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    
+    mkdir -p "$HOME/.config/tmux/plugins"
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
+
     # Install tmux plugins automatically
-    if [[ -f "$HOME/.tmux.conf" ]]; then
+    if [[ -f "$HOME/.config/tmux/tmux.conf" ]]; then
         echo -e "${GREEN}Installing tmux plugins automatically...${NC}"
-        "$HOME/.tmux/plugins/tpm/scripts/install_plugins.sh"
+        "$HOME/.config/tmux/plugins/tpm/scripts/install_plugins.sh"
         echo -e "${GREEN}tmux plugins installed successfully.${NC}"
     else
-        echo -e "${YELLOW}tmux.conf not found. Run 'tmux source ~/.tmux.conf' and then 'prefix + I' to install tmux plugins after installation.${NC}"
+        echo -e "${YELLOW}tmux.conf not found. Run 'tmux source ~/.config/tmux/tmux.conf' and then 'prefix + I' to install tmux plugins after installation.${NC}"
     fi
 else
     echo -e "${GREEN}TPM already installed. Updating plugins...${NC}"
-    "$HOME/.tmux/plugins/tpm/scripts/install_plugins.sh"
+    "$HOME/.config/tmux/plugins/tpm/scripts/install_plugins.sh"
 fi
 
 # Compile telescope-fzf-native after Neovim plugins are installed
