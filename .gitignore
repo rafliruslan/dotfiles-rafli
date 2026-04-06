@@ -84,3 +84,6 @@ config/sketchybar/helpers/*
 
 # Lock files
 *.lock
+
+# Plan document
+DOTFILES_PLAN.md

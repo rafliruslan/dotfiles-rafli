@@ -64,8 +64,11 @@ create_symlink "$DOTFILES_DIR/config/raycast" "$HOME/.config/raycast"
 
 # Install tmux configuration
 echo -e "${GREEN}Installing tmux configuration...${NC}"
-create_symlink "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
-create_symlink "$DOTFILES_DIR/tmux/plugins" "$HOME/.tmux/plugins"
+create_symlink "$DOTFILES_DIR/config/tmux" "$HOME/.config/tmux"
+
+# Install TheFuck configuration
+echo -e "${GREEN}Installing TheFuck configuration...${NC}"
+create_symlink "$DOTFILES_DIR/config/thefuck" "$HOME/.config/thefuck"
 
 # Install shell configuration
 echo -e "${GREEN}Installing shell configuration...${NC}"

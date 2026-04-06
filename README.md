@@ -85,10 +85,9 @@ dotfiles-rafli/
 │   ├── sketchybar/              # SketchyBar status bar
 │   ├── ghostty/                 # Ghostty terminal
 │   ├── aerospace/               # AeroSpace window manager
-│   └── raycast/                 # Raycast launcher
-├── tmux/
-│   ├── .tmux.conf              # Main tmux config
-│   └── plugins/                # Tmux plugins
+│   ├── raycast/                 # Raycast launcher
+│   ├── tmux/                    # tmux configuration
+│   └── thefuck/                 # TheFuck auto-corrector
 ├── shell/
 │   ├── .zshrc                  # Zsh configuration
 │   ├── .zprofile               # Zsh profile
@@ -99,7 +98,6 @@ dotfiles-rafli/
 │   └── backup.sh               # Backup existing configs
 ├── Brewfile                    # Homebrew dependencies
 ├── .gitignore                  # Repository gitignore
-├── DOTFILES_PLAN.md           # Detailed implementation plan
 └── README.md                   # This file
 ```
 
@@ -115,11 +113,9 @@ dotfiles-rafli/
 - **Autocomplete**: nvim-cmp with multiple sources
 
 ### tmux
-- **Plugin Manager**: TPM (tmux Plugin Manager)
-- **Session Management**: tmux-resurrect, tmux-continuum
-- **Navigation**: vim-tmux-navigator
-- **Theme**: tokyo-night theme
-- **Enhanced Experience**: tmux-sensible
+- **Plugin Manager**: TPM (tmux Plugin Manager) at `~/.config/tmux/plugins/tpm`
+- **Session Management**: tmux-resurrect, tmux-continuum (auto-restore on server start)
+- **Mouse Support**: Enabled with macOS clipboard integration via pbcopy
 
 ### SketchyBar
 - **Lua Configuration**: Modular setup with separate item configurations
@@ -154,7 +150,7 @@ All configurations are modular and can be customized:
 ### First-Time Setup
 1. Grant necessary permissions in System Preferences > Security & Privacy
 2. tmux plugins are installed automatically during setup
-   - If needed manually: `tmux source ~/.tmux.conf` then `prefix + I`
+   - If needed manually: `tmux source ~/.config/tmux/tmux.conf` then `prefix + I`
 3. Restart terminal applications after installation
 4. Some configurations may require a logout/restart
 
@@ -187,11 +183,11 @@ cd ~/.dotfiles-backup-YYYYMMDD_HHMMSS
 **tmux plugins not loading**
 ```bash
 # If TPM is missing, install it first:
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 
 # Then reload configuration and install plugins:
-tmux source ~/.tmux.conf
-~/.tmux/plugins/tpm/scripts/install_plugins.sh
+tmux source ~/.config/tmux/tmux.conf
+~/.config/tmux/plugins/tpm/scripts/install_plugins.sh
 
 # Or manually with prefix + I in tmux session
 ```
@@ -220,9 +216,8 @@ make -C ~/.local/share/nvim/lazy/telescope-fzf-native.nvim
 
 ### Getting Help
 
-1. Check the [detailed plan](DOTFILES_PLAN.md) for implementation details
-2. Review individual configuration files for specific settings
-3. Check application-specific documentation for advanced customization
+1. Review individual configuration files for specific settings
+2. Check application-specific documentation for advanced customization
 
 ## 🤝 Contributing
 
