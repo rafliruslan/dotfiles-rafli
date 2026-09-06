@@ -1,0 +1,20 @@
+[user]
+  name = rafliruslan
+  email = dev@rafliruslan.com
+
+[includeIf "gitdir:~/personal/"]
+  path = ~/.gitconfig-personal
+
+[includeIf "gitdir/i:~/Documents/A1C/"]
+  path = ~/.gitconfig-a1c
+
+[core]
+  sshCommand = ssh
+
+[init]
+  defaultBranch = main
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

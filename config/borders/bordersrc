@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# GitHub High Contrast, following the macOS appearance setting.
+# Colors match ~/.config/ghostty/config and ~/.config/sketchybar/colors.lua
+
+if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
+  # GitHub Dark High Contrast: blue #71b7ff, magenta #cb9eff, bg2 #3d444d
+  ACTIVE="gradient(top_left=0xff71b7ff,bottom_right=0xffcb9eff)"
+  INACTIVE=0xff3d444d
+else
+  # GitHub Light High Contrast: blue #0349b4, magenta #622cbc, bg2 #ced5dc
+  ACTIVE="gradient(top_left=0xff0349b4,bottom_right=0xff622cbc)"
+  INACTIVE=0xffced5dc
+fi
+
+options=(
+  style=round
+  width=5.0
+  hidpi=on
+  active_color="$ACTIVE"
+  inactive_color="$INACTIVE"
+)
+
+borders "${options[@]}"

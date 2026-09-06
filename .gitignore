@@ -38,16 +38,15 @@ config/tmux/plugins/*/
 
 # Configs with sensitive/auth data
 config/gh/
-config/git/
+config/git/*
 config/composer/
 
 # TheFuck cache
 config/thefuck/__pycache__/
 
-# Raycast sensitive data
-config/raycast/commands/
-config/raycast/extensions/
-config/raycast/quicklinks/
+# Raycast: all of it. config.json carries auth tokens and the filename
+# gives no hint, which is how two of them stayed public for five months.
+config/raycast/
 
 # Backup files
 *.backup
@@ -87,3 +86,21 @@ config/sketchybar/helpers/*
 
 # Plan document
 DOTFILES_PLAN.md
+
+# Work identity - this repo is public
+shell/.gitconfig-a1c
+
+# Installed Claude skills are third-party and re-installable, like node_modules
+claude/skills/
+
+# Claude state: credentials, transcripts, caches. Only config is tracked.
+claude/.credentials.json
+claude/projects/
+claude/sessions/
+claude/history.jsonl
+
+# Exceptions: these match the broad name rules above but hold no secrets.
+# The scanner itself trips "*secret*", which is a fair illustration of why
+# name-based rules are the wrong tool for this job.
+!config/git/ignore
+!scripts/secret-scan.sh
