@@ -59,9 +59,6 @@ echo -e "${GREEN}Installing AeroSpace configuration...${NC}"
 create_symlink "$DOTFILES_DIR/config/aerospace" "$HOME/.config/aerospace"
 
 # Install Raycast configuration
-echo -e "${GREEN}Installing Raycast configuration...${NC}"
-create_symlink "$DOTFILES_DIR/config/raycast" "$HOME/.config/raycast"
-
 # Install tmux configuration
 echo -e "${GREEN}Installing tmux configuration...${NC}"
 create_symlink "$DOTFILES_DIR/config/tmux" "$HOME/.config/tmux"
@@ -75,6 +72,34 @@ echo -e "${GREEN}Installing shell configuration...${NC}"
 create_symlink "$DOTFILES_DIR/shell/.zshrc" "$HOME/.zshrc"
 create_symlink "$DOTFILES_DIR/shell/.zprofile" "$HOME/.zprofile"
 create_symlink "$DOTFILES_DIR/shell/.p10k.zsh" "$HOME/.p10k.zsh"
+create_symlink "$DOTFILES_DIR/shell/.zshenv" "$HOME/.zshenv"
+create_symlink "$DOTFILES_DIR/shell/.tmux.conf" "$HOME/.tmux.conf"
+create_symlink "$DOTFILES_DIR/shell/.gitconfig" "$HOME/.gitconfig"
+create_symlink "$DOTFILES_DIR/shell/.gitconfig-personal" "$HOME/.gitconfig-personal"
+create_symlink "$DOTFILES_DIR/.markdownlint-cli2.yaml" "$HOME/.markdownlint-cli2.yaml"
+
+# Window-manager borders and the global git ignore
+echo -e "${GREEN}Installing borders and git configuration...${NC}"
+create_symlink "$DOTFILES_DIR/config/borders" "$HOME/.config/borders"
+mkdir -p "$HOME/.config/git"
+create_symlink "$DOTFILES_DIR/config/git/ignore" "$HOME/.config/git/ignore"
+
+# Claude Code: config only. Skills are re-installed, state is never restored.
+echo -e "${GREEN}Installing Claude Code configuration...${NC}"
+mkdir -p "$HOME/.claude"
+create_symlink "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+create_symlink "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+create_symlink "$DOTFILES_DIR/claude/hooks" "$HOME/.claude/hooks"
+
+# Secrets never live in the repo. Seed the local file the shell sources.
+if [[ ! -f "$HOME/.zshenv.local" ]]; then
+    echo "# Machine-local secrets. Never committed." > "$HOME/.zshenv.local"
+    chmod 600 "$HOME/.zshenv.local"
+    echo -e "${YELLOW}Created ~/.zshenv.local - put your tokens there, not in .zshenv${NC}"
+fi
+
+# Refuse commits that carry credentials.
+git -C "$DOTFILES_DIR" config core.hooksPath scripts/hooks
 
 echo -e "${GREEN}Dotfiles installation completed!${NC}"
 echo -e "${YELLOW}Note: You may need to restart your shell or source your configuration files.${NC}"
