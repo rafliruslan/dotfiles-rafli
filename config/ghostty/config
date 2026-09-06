@@ -1,38 +1,28 @@
-# Coolnight theme colors to match WezTerm
-foreground = CBE0F0
-background = 011423
-cursor-color = 47FF9C
-selection-foreground = CBE0F0
-selection-background = 033259
+# Theme — auto-switches with macOS appearance
+theme = dark:GitHub Dark High Contrast,light:GitHub Light High Contrast
 
-# ANSI colors
-palette = 0=#214969
-palette = 1=#E52E2E
-palette = 2=#44FFB1
-palette = 3=#FFE073
-palette = 4=#0FC5ED
-palette = 5=#a277ff
-palette = 6=#24EAF7
-palette = 7=#24EAF7
-
-# Bright colors
-palette = 8=#214969
-palette = 9=#E52E2E
-palette = 10=#44FFB1
-palette = 11=#FFE073
-palette = 12=#A277FF
-palette = 13=#a277ff
-palette = 14=#24EAF7
-palette = 15=#24EAF7
-
-# Font to match WezTerm
-font-family = "IBM Plex Mono"
-font-size = 19
+# Font — JetBrainsMono NF, italic everywhere
+font-family = "JetBrainsMono Nerd Font Mono"
+font-size = 15
+font-style = Italic
+font-style-bold = Bold Italic
+font-style-italic = Italic
+font-style-bold-italic = Bold Italic
 
 # Terminal settings  
 term = xterm-256color
 
 # Window settings
-window-decoration = false
-background-opacity = 0.95
+window-decoration = true
+# Glass: translucent + blurred backdrop (macOS native blur)
+background-opacity = 0.82
+background-blur = 20
 keybind = shift+enter=text:\n
+keybind = super+left=goto_split:left
+keybind = super+right=goto_split:right
+keybind = super+up=goto_split:up
+keybind = super+down=goto_split:down
+
+# Chrome — herdr owns tabs/panes, so Ghostty renders none
+macos-titlebar-style = hidden
+window-show-tab-bar = never

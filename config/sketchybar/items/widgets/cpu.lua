@@ -28,7 +28,8 @@ local cpu = sbar.add("graph", "widgets.cpu" , 42, {
     width = 0,
     y_offset = 4
   },
-  padding_right = settings.paddings + 6
+  padding_right = settings.paddings + 6,
+  popup = { align = "center", background = { border_width = 5, border_color = colors.black } }
 })
 
 cpu:subscribe("cpu_update", function(env)
@@ -53,7 +54,67 @@ cpu:subscribe("cpu_update", function(env)
   })
 end)
 
-cpu:subscribe("mouse.clicked", function(env)
+-- ── hover popup: top processes by CPU ──────────────────────────────
+local POPUP_WIDTH = 260
+local MONO = "JetBrainsMono Nerd Font Mono"
+local PROC_SLOTS = 5
+
+local cpu_header = sbar.add("item", {
+  position = "popup." .. cpu.name,
+  width = POPUP_WIDTH,
+  align = "center",
+  icon = { drawing = false },
+  label = {
+    string = "top processes",
+    color = colors.blue,
+    font = { family = MONO, style = settings.font.style_map["Bold"], size = 12.0 },
+  },
+})
+
+local procs = {}
+for i = 1, PROC_SLOTS do
+  procs[i] = sbar.add("item", {
+    position = "popup." .. cpu.name,
+    width = POPUP_WIDTH,
+    align = "left",
+    icon = { drawing = false },
+    label = {
+      font = { family = MONO, size = 12.0 },
+      color = colors.white,
+      padding_left = 10,
+      string = "",
+    },
+    drawing = false,
+  })
+end
+
+local function hide_cpu_popup()
+  cpu:set({ popup = { drawing = false } })
+end
+
+local function show_cpu_popup()
+  sbar.exec("ps -Aceo pcpu,comm -r | head -n " .. (PROC_SLOTS + 1) .. " | tail -n +2", function(out)
+    local i = 0
+    for raw in (out or ""):gmatch("[^\r\n]+") do
+      local pct, name = raw:match("^%s*([%d%.]+)%s+(.+)$")
+      if pct and i < PROC_SLOTS then
+        i = i + 1
+        procs[i]:set({
+          label = { string = string.format("%5s%%  %s", pct, name:sub(1, 20)) },
+          drawing = true,
+        })
+      end
+    end
+    for j = i + 1, PROC_SLOTS do procs[j]:set({ drawing = false }) end
+  end)
+  cpu:set({ popup = { drawing = true } })
+end
+
+cpu:subscribe("mouse.entered", show_cpu_popup)
+cpu:subscribe("mouse.exited", hide_cpu_popup)
+cpu:subscribe("mouse.exited.global", hide_cpu_popup)
+cpu:subscribe("mouse.clicked", function()
+  hide_cpu_popup()
   sbar.exec("open -a 'Activity Monitor'")
 end)
 

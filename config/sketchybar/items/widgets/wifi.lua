@@ -8,7 +8,7 @@ sbar.exec("killall network_load >/dev/null; $CONFIG_DIR/helpers/event_providers/
 
 local popup_width = 250
 
-local wifi_up = sbar.add("item", "widgets.wifi1", {
+local wifi_up = sbar.add("item", "widgets.wifi.up", {
   position = "right",
   padding_left = -5,
   width = 0,
@@ -32,7 +32,7 @@ local wifi_up = sbar.add("item", "widgets.wifi1", {
   y_offset = 4,
 })
 
-local wifi_down = sbar.add("item", "widgets.wifi2", {
+local wifi_down = sbar.add("item", "widgets.wifi.down", {
   position = "right",
   padding_left = -5,
   icon = {
