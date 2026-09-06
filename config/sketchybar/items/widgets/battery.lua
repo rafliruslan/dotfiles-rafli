@@ -15,17 +15,23 @@ local battery = sbar.add("item", "widgets.battery", {
   popup = { align = "center" }
 })
 
+local popup_width = 240
+
 local remaining_time = sbar.add("item", {
   position = "popup." .. battery.name,
+  width = popup_width,
   icon = {
     string = "Time remaining:",
-    width = 100,
-    align = "left"
+    -- JetBrainsMono is wider than SF Pro; 100 clipped this label.
+    width = popup_width / 2,
+    align = "left",
+    font = { family = settings.font.text },
   },
   label = {
     string = "??:??h",
-    width = 100,
-    align = "right"
+    width = popup_width / 2,
+    align = "right",
+    font = { family = settings.font.numbers },
   },
 })
 

@@ -104,3 +104,10 @@ claude/history.jsonl
 # name-based rules are the wrong tool for this job.
 !config/git/ignore
 !scripts/secret-scan.sh
+
+# Editor and hand-rolled backups. *.backup was covered; *.bak was not,
+# and seven sketchybar .bak files rode in on the first refresh.
+*.bak
+*.bak[0-9]
+*.orig
+*.rej

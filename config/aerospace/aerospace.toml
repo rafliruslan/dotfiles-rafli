@@ -15,6 +15,14 @@ after-startup-command = []
 start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
+# Opting in to config-version 2 changes exactly one thing that matters
+# here: persistent-workspaces is no longer inferred from the right hand
+# side of the keybindings, so the workspaces alt-1..alt-9 switch to have
+# to be named or they stop existing when empty.
+config-version = 2
+
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
 enable-normalization-flatten-containers = true
 enable-normalization-opposite-orientation-for-nested-containers = true
 
@@ -67,8 +75,13 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     inner.vertical =   10
     outer.left =       10
     outer.bottom =     10
-    outer.top =        10
-    outer.right =      10
+    # SketchyBar is 40px tall at the top; windows should start at y=50.
+    # The built-in display has a notch, and macOS keeps that ~32pt band out
+    # of the usable frame in hardware -- this is NOT the menu bar, which is
+    # already set to auto-hide (_HIHideMenuBar = 1). So the built-in needs
+    # only 18 to land at y=50; external displays reserve nothing -> 50.
+    outer.top =        [{ monitor."built-in" = 18 }, 50]
+    outer.right =      26
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -193,13 +206,25 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'md.obsidian'
     run = "move-node-to-workspace 1"
     
+# Slack, Linear and WhatsApp are Aside PWAs, not their native apps. Each
+# gets its own bundle id derived from the extension id, so a rule aimed at
+# com.tinyspeck.slackmacgap never fires -- these windows were landing
+# wherever they happened to open and being moved by hand.
 [[on-window-detected]]
-    if.app-id = 'app.zen-browser.zen'
-    run = "move-node-to-workspace 3"
+    if.app-id = 'at.studio.AsideBrowser.app.deabakhnaapgoejhnggflphfcocnkeej'
+    run = "move-node-to-workspace 3"   # Slack
 
 [[on-window-detected]]
-    if.app-id = 'com.tinyspeck.slackmacgap'
-    run = "move-node-to-workspace 4"
+    if.app-id = 'at.studio.AsideBrowser.app.bgdbmehlmdmddlgneophbcddadgknlpm'
+    run = "move-node-to-workspace 3"   # Linear
+
+[[on-window-detected]]
+    if.app-id = 'at.studio.AsideBrowser.app.hnpfjngllnobngcgfapefoaidbinmjnm'
+    run = "move-node-to-workspace 2"   # WhatsApp Web
+
+[[on-window-detected]]
+    if.app-id = 'at.studio.AsideBrowser'
+    run = "move-node-to-workspace 2"   # the browser itself
 
 ## [[on-window-detected]]
 ##    if.app-id = 'com.brave.Browser'
