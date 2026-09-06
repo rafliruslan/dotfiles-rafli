@@ -70,12 +70,24 @@ config/raycast/
 config/sketchybar/helpers/*
 !config/sketchybar/helpers/.gitkeep
 
-# Personal sensitive data
-*password*
-*secret*
-*key*
-*token*
-*credential*
+# Filenames that ARE credentials by convention. Deliberately narrow.
+#
+# This list used to be *password* *secret* *key* *token* *credential*, which
+# got the job exactly backwards: it sailed past config/raycast/config.json,
+# the one file that actually held tokens, while silently dropping three
+# legitimate files - nvim's keymaps.lua, config/git/ignore, and the secret
+# scanner itself. Contents decide whether something is a secret, so
+# scripts/secret-scan.sh does that job on every commit.
+*.pem
+*.p12
+*.pfx
+*.keystore
+id_rsa*
+id_ecdsa*
+id_ed25519*
+.env
+.env.*
+*credentials.json
 
 # System-specific files that shouldn't be shared
 *.local
@@ -99,11 +111,9 @@ claude/projects/
 claude/sessions/
 claude/history.jsonl
 
-# Exceptions: these match the broad name rules above but hold no secrets.
-# The scanner itself trips "*secret*", which is a fair illustration of why
-# name-based rules are the wrong tool for this job.
+# config/git/ is excluded as a directory below, so the file inside needs an
+# explicit re-include; git never descends into an ignored directory.
 !config/git/ignore
-!scripts/secret-scan.sh
 
 # Editor and hand-rolled backups. *.backup was covered; *.bak was not,
 # and seven sketchybar .bak files rode in on the first refresh.
