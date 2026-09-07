@@ -66,9 +66,11 @@ config/raycast/
 .env
 .env.local
 
-# SketchyBar compiled helpers (if any)
-config/sketchybar/helpers/*
-!config/sketchybar/helpers/.gitkeep
+# SketchyBar compiled helper artifacts. The C and Python sources beside them
+# are configuration and stay tracked -- the widgets call them by path, so a
+# repo without them cannot reproduce the bar.
+config/sketchybar/helpers/**/bin/
+config/sketchybar/helpers/**/__pycache__/
 
 # Filenames that ARE credentials by convention. Deliberately narrow.
 #

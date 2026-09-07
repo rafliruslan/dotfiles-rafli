@@ -6,6 +6,9 @@ local FONT_SIZE = 15
 local POPUP_W = 240
 local HELPER = "$CONFIG_DIR/helpers/weather.py"
 
+local CLOUD = "\u{F0590}"  -- md-weather_cloudy
+local RAIN = "\u{F0596}"   -- md-weather_pouring
+
 -- Rain probability thresholds for the pickup reminder
 local WARN, ALERT = 30, 60
 
@@ -14,7 +17,7 @@ local weather = sbar.add("item", "widgets.weather", {
   icon = {
     font = { family = settings.font.text, size = 16.0 },
     color = colors.blue,
-    string = "",
+    string = CLOUD,
   },
   label = { font = { family = settings.font.numbers }, string = "--" },
   update_freq = 900,
@@ -59,6 +62,31 @@ for i = 1, 8 do
   })
 end
 
+-- Footer: which place this forecast is for.
+sbar.add("item", {
+  position = "popup." .. weather.name,
+  width = POPUP_W,
+  icon = { drawing = false },
+  label = { string = "──────────────", color = colors.grey, font = { size = 10.0 } },
+})
+
+local meta = {}
+for i = 1, 2 do
+  meta[i] = sbar.add("item", {
+    position = "popup." .. weather.name,
+    width = POPUP_W,
+    icon = { drawing = false },
+    label = {
+      font = { family = MONO, size = 11.0 },
+      color = colors.grey,
+      align = "left",
+      padding_left = 10,
+      string = "",
+    },
+    drawing = false,
+  })
+end
+
 sbar.add("bracket", "widgets.weather.bracket", { weather.name }, {
   background = { color = colors.bg1 },
 })
@@ -68,9 +96,11 @@ sbar.add("item", "widgets.weather.padding", {
 })
 
 -- ── data ───────────────────────────────────────────────────────────
-local function refresh(open_popup)
-  sbar.exec(HELPER, function(out)
-    local i = 0
+-- relocate skips the location cache: used on the signals that mean we may
+-- have moved, since a fix costs a second or two and is wasteful on a routine tick.
+local function refresh(open_popup, relocate)
+  sbar.exec(HELPER .. (relocate and " --force-location" or ""), function(out)
+    local i, m = 0, 0
     for line in (out or ""):gmatch("[^\r\n]+") do
       local kind, a, b, c, d = line:match("^(%u+)|([^|]*)|?([^|]*)|?([^|]*)|?(.*)$")
       if kind == "NOW" then
@@ -79,10 +109,14 @@ local function refresh(open_popup)
         if pct >= ALERT then col = colors.red
         elseif pct >= WARN then col = colors.yellow end
         weather:set({
-          icon = { string = (a ~= "" and a or ""), color = col },
+          icon = { string = (a == "rain") and RAIN or CLOUD, color = col },
           label = { string = b .. "°" },
         })
         pickup:set({ label = { string = string.format("%s  %d%% rain", d, pct), color = col } })
+      elseif kind == "META" and m < #meta then
+        m = m + 1
+        meta[m]:set({ label = { string = a }, drawing = true })
+
       elseif kind == "HOUR" and i < #hours then
         i = i + 1
         local pct = tonumber(c) or 0
@@ -97,11 +131,13 @@ local function refresh(open_popup)
       end
     end
     for j = i + 1, #hours do hours[j]:set({ drawing = false }) end
+    for j = m + 1, #meta do meta[j]:set({ drawing = false }) end
     if open_popup then weather:set({ popup = { drawing = true } }) end
   end)
 end
 
-weather:subscribe({ "routine", "forced", "system_woke" }, function() refresh(false) end)
+weather:subscribe({ "routine", "forced" }, function() refresh(false) end)
+weather:subscribe({ "system_woke", "wifi_change" }, function() refresh(false, true) end)
 weather:subscribe("mouse.entered", function() refresh(true) end)
 weather:subscribe("mouse.exited", function() weather:set({ popup = { drawing = false } }) end)
 weather:subscribe("mouse.exited.global", function() weather:set({ popup = { drawing = false } }) end)
