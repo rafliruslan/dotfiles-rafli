@@ -11,8 +11,8 @@ local HELPER = "$CONFIG_DIR/helpers/prayer.py"
 -- Minutes before the adhan at which the widget starts warning.
 local WARN, ALERT = 15, 5
 
--- Imsak and Terbit are informational: shown, but never counted down to.
-local INFO_ROWS = { Imsak = true, Terbit = true }
+-- Imsak and Sunrise are informational: shown, but never counted down to.
+local INFO_ROWS = { Imsak = true, Sunrise = true }
 
 local prayer = sbar.add("item", "prayer", {
   position = "left",

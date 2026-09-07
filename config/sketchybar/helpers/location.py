@@ -129,13 +129,13 @@ def describe(loc):
     """A short, honest label for where the position came from."""
     age = loc["age"] or 0
     if age < 90:
-        when = "baru saja"
+        when = "just now"
     elif age < 3600:
-        when = f"{int(age // 60)} mnt lalu"
+        when = f"{int(age // 60)} min ago"
     elif age < 86400:
-        when = f"{int(age // 3600)} jam lalu"
+        when = f"{int(age // 3600)} hr ago"
     else:
-        when = f"{int(age // 86400)} hari lalu"
+        when = f"{int(age // 86400)} days ago"
     return f"GPS {when}"
 
 

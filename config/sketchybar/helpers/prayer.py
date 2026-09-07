@@ -34,12 +34,12 @@ if not LOC:
     # Nothing known and nothing cached. Prayer times for a guessed place are
     # worse than none, so say so.
     print("NEXT|--|--:--|0")
-    print("HIJRI|lokasi tidak diketahui")
-    print("META|Aktifkan Location Services")
+    print("HIJRI|location unknown")
+    print("META|Enable Location Services")
     raise SystemExit(0)
 
 LAT, LON = LOC["lat"], LOC["lon"]
-PLACE = LOC["place"] or "Lokasi tidak dikenal"
+PLACE = LOC["place"] or "Unknown place"
 
 # Cached times belong to one place and one calculation method. Changing any of
 # these means the stored months are for somewhere else.
@@ -47,24 +47,18 @@ FINGERPRINT = f"{LAT},{LON},{METHOD},{TUNE}"
 
 METHOD_LABEL = {20: "Kemenag RI"}
 
+# The API's own English carries macrons and an ayn ("Rabi= al-awwal") that the
+# bar font renders poorly, so transliterate plainly here.
 HIJRI_MONTHS = [
-    "Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir",
-    "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban",
-    "Ramadhan", "Syawal", "Dzulqaidah", "Dzulhijjah",
+    "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
+    "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Shaban",
+    "Ramadan", "Shawwal", "Dhul-Qadah", "Dhul-Hijjah",
 ]
 
-# Display name -> Aladhan timings key. Order is the order shown in the popup.
-ROWS = [
-    ("Imsak", "Imsak"),
-    ("Subuh", "Fajr"),
-    ("Terbit", "Sunrise"),
-    ("Dzuhur", "Dhuhr"),
-    ("Ashar", "Asr"),
-    ("Maghrib", "Maghrib"),
-    ("Isya", "Isha"),
-]
-# Only the five fardhu are counted down to; Imsak and Terbit are informational.
-FARDHU = {"Subuh", "Dzuhur", "Ashar", "Maghrib", "Isya"}
+# Aladhan timings keys, in the order the popup shows them.
+ROWS = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]
+# Only the five fardhu are counted down to; Imsak and Sunrise are informational.
+FARDHU = {"Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"}
 
 dirty = False
 
@@ -153,9 +147,9 @@ def resolve(months):
 
 def bail():
     print("NEXT|--|--:--|0")
-    print("HIJRI|jadwal tidak tersedia")
+    print("HIJRI|times unavailable")
     print(f"META|{PLACE}")
-    print(f"META|Lokasi: {location.describe(LOC)}")
+    print(f"META|Location: {location.describe(LOC)}")
     raise SystemExit(0)
 
 
@@ -169,7 +163,7 @@ except Exception:
     # stand on the previous place's schedule and say plainly that is what it is.
     if elsewhere and elsewhere.get("months"):
         months, dirty = elsewhere["months"], False
-        stale_place = elsewhere.get("place") or "lokasi sebelumnya"
+        stale_place = elsewhere.get("place") or "the previous place"
         try:
             d_today, tz, api_tz, now = resolve(months)
         except Exception:
@@ -181,7 +175,7 @@ today = now.date()
 tomorrow = (now + timedelta(days=1)).date()
 midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
-# Only needed after Isya, and only across a month boundary. Losing it must
+# Only needed after Isha, and only across a month boundary. Losing it must
 # not blank the widget, so a failure here is survivable.
 try:
     d_tomorrow = day_data(months, tomorrow)
@@ -192,17 +186,17 @@ if dirty and not stale_place:
     save_cache(months, {f"{d.year}-{d.month:02d}" for d in (today, tomorrow)})
 
 # Today's schedule, as (display name, datetime).
-schedule = [(name, at(d_today, midnight, key)) for name, key in ROWS]
+schedule = [(name, at(d_today, midnight, name)) for name in ROWS]
 
-# The next fardhu: the first one still ahead today, else tomorrow's Subuh.
+# The next fardhu: the first one still ahead today, else tomorrow's Fajr.
 nxt = next(((n, t) for n, t in schedule if n in FARDHU and t > now), None)
 if nxt is None:
     if d_tomorrow:
-        nxt = ("Subuh", at(d_tomorrow, midnight + timedelta(days=1), "Fajr"))
+        nxt = ("Fajr", at(d_tomorrow, midnight + timedelta(days=1), "Fajr"))
     else:
-        # No data for tomorrow: reuse today's Subuh as an estimate. It moves by
+        # No data for tomorrow: reuse today's Fajr as an estimate. It moves by
         # under a minute a day here, so the countdown stays honest.
-        nxt = ("Subuh", at(d_today, midnight + timedelta(days=1), "Fajr"))
+        nxt = ("Fajr", at(d_today, midnight + timedelta(days=1), "Fajr"))
 
 # The most recent fardhu, if the adhan was within the last few minutes.
 passed = [(n, t) for n, t in schedule if n in FARDHU and t <= now]
@@ -227,7 +221,7 @@ meta = d_today.get("meta", {})
 method = METHOD_LABEL.get(METHOD) or meta.get("method", {}).get("name", "")[:20]
 print(f"META|{PLACE}")
 print(f"META|Timezone: {api_tz or getattr(tz, 'key', '?')} ({now:%H:%M})")
-print(f"META|Lokasi: {location.describe(LOC)}")
+print(f"META|Location: {location.describe(LOC)}")
 if stale_place:
-    print(f"META|! jadwal masih {stale_place}")
-print(f"META|Metode {method}")
+    print(f"META|! times still for {stale_place}")
+print(f"META|Method: {method}")

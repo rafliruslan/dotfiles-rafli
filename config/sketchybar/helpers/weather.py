@@ -17,8 +17,8 @@ import location
 
 LOC = location.current(force="--force-location" in sys.argv)
 if not LOC:
-    print("NOW|dry|--|0|lokasi tidak diketahui")
-    print("META|Aktifkan Location Services")
+    print("NOW|dry|--|0|location unknown")
+    print("META|Enable Location Services")
     sys.exit(0)
 
 LAT, LON = LOC["lat"], LOC["lon"]
@@ -63,8 +63,8 @@ try:
     d = fetch()
 except Exception as e:
     print("NOW|dry|--|0|weather unavailable")
-    print(f"META|{LOC['place'] or 'Lokasi tidak dikenal'}")
-    print(f"META|Lokasi: {location.describe(LOC)}")
+    print(f"META|{LOC['place'] or 'Unknown place'}")
+    print(f"META|Location: {location.describe(LOC)}")
     sys.exit(0)
 
 cur = d["current"]
@@ -95,5 +95,5 @@ for hh, tp, pp in rows:
     print(f"HOUR|{hh}|{tp}|{pp}")
 
 # Footer: which place this forecast is for, and how that was decided.
-print(f"META|{LOC['place'] or 'Lokasi tidak dikenal'}")
-print(f"META|Lokasi: {location.describe(LOC)}")
+print(f"META|{LOC['place'] or 'Unknown place'}")
+print(f"META|Location: {location.describe(LOC)}")
