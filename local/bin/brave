@@ -1,0 +1,13 @@
+#!/bin/sh
+# Brave with the agent's data dir and debug port. A Dock or Spotlight launch
+# passes no arguments, so the port would silently not open; use this instead.
+#
+# No -n: it forces a second instance of the same bundle id, and AeroSpace tracks
+# one running application per bundle id -- the second one's windows never get
+# tiled. Without it, Chromium's process singleton hands this command line to the
+# instance already on this data dir and opens a window there.
+exec open -a "/Applications/Brave Browser.app" --args \
+  --user-data-dir="$HOME/.local/share/brave-profile" \
+  --remote-debugging-port=9222 \
+  --profile-directory="Profile 1" \
+  "$@"

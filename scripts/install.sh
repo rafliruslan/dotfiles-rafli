@@ -91,6 +91,43 @@ create_symlink "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 create_symlink "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 create_symlink "$DOTFILES_DIR/claude/hooks" "$HOME/.claude/hooks"
 
+# Brave profile launchers.
+#
+# A Dock or Spotlight launch of Brave itself passes no --user-data-dir, so it
+# starts a second browser on the stock profile path. Two processes then share
+# one bundle id, AeroSpace tracks only the first, and the second's windows are
+# never tiled. These shims make every launch carry the same flags.
+#
+# Copied, not symlinked: the Dock resolves a tile by bundle path, and the icon
+# is taken from Brave's own so the repo carries no binary.
+echo -e "${GREEN}Installing Brave profile launchers...${NC}"
+BRAVE_ICON="/Applications/Brave Browser.app/Contents/Resources/app.icns"
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+
+install_brave_shim() {
+    local name="$1"
+    local src="$DOTFILES_DIR/applications/$name.app"
+    local dst="$HOME/Applications/$name.app"
+
+    rm -rf "$dst"
+    mkdir -p "$dst/Contents/Resources"
+    cp "$src/Contents/Info.plist" "$dst/Contents/Info.plist"
+    cp -R "$src/Contents/MacOS" "$dst/Contents/"
+    chmod +x "$dst/Contents/MacOS/"*
+    if [[ -f "$BRAVE_ICON" ]]; then
+        cp "$BRAVE_ICON" "$dst/Contents/Resources/app.icns"
+    else
+        echo -e "${YELLOW}Brave not found; $name will use a generic icon${NC}"
+    fi
+    [[ -x "$LSREGISTER" ]] && "$LSREGISTER" -f "$dst"
+    echo -e "${GREEN}Installed $dst${NC}"
+}
+
+install_brave_shim "Brave Personal"
+install_brave_shim "Brave Work"
+
+create_symlink "$DOTFILES_DIR/local/bin/brave" "$HOME/.local/bin/brave"
+
 # Secrets never live in the repo. Seed the local file the shell sources.
 if [[ ! -f "$HOME/.zshenv.local" ]]; then
     echo "# Machine-local secrets. Never committed." > "$HOME/.zshenv.local"

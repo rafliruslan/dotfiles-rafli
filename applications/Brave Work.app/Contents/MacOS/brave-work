@@ -1,0 +1,24 @@
+#!/bin/sh
+# Opens Brave against the agent's data dir, on the Work profile (Profile 1).
+#
+# The stock location (~/Library/Application Support/BraveSoftware) has no
+# profile: the real one moved to ~/.local/share/brave-profile because
+# Chromium 136+ refuses --remote-debugging-port on a default-path profile.
+# Launching Brave from the Dock therefore made a blank new profile every time.
+#
+# Go through `open` rather than exec'ing the binary. Exec'ing left LaunchServices
+# holding a registration for Brave's bundle with no pid behind it, and AeroSpace
+# enumerates windows through LaunchServices -- so the window it opened was never
+# tiled. `open` hands the launch to Brave's own bundle, which registers cleanly.
+#
+# No -n: if Brave already runs on this data dir, Chromium's process singleton
+# takes the command line and opens a window in that instance, which is the one
+# AeroSpace is already managing. -n would fork a second registration of the same
+# bundle id and bring the problem back.
+#
+# This is the profile the agent drives, so it carries the debug port too.
+exec open -a "/Applications/Brave Browser.app" --args \
+  --user-data-dir="$HOME/.local/share/brave-profile" \
+  --remote-debugging-port=9222 \
+  --profile-directory="Profile 1" \
+  "$@"
