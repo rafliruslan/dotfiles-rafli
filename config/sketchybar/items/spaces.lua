@@ -122,9 +122,15 @@ local spaces_indicator = sbar.add("item", {
 })
 
 space_window_observer:subscribe("space_windows_change", function(env)
+  -- Only spaces 1..10 have items. macOS reports changes for spaces outside
+  -- that range too -- an eleventh desktop, or one being torn down -- and
+  -- indexing past the end throws rather than returning nil harmlessly.
+  local space = spaces[tonumber(env.INFO.space or "")]
+  if not space then return end
+
   local icon_line = ""
   local no_app = true
-  for app, count in pairs(env.INFO.apps) do
+  for app, count in pairs(env.INFO.apps or {}) do
     no_app = false
     local lookup = app_icons[app]
     local icon = ((lookup == nil) and app_icons["Default"] or lookup)
@@ -135,7 +141,7 @@ space_window_observer:subscribe("space_windows_change", function(env)
     icon_line = " —"
   end
   sbar.animate("tanh", 10, function()
-    spaces[env.INFO.space]:set({ label = icon_line })
+    space:set({ label = icon_line })
   end)
 end)
 

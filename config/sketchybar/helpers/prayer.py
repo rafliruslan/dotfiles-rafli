@@ -87,7 +87,9 @@ def save_cache(months, keep):
         "place": PLACE,
         "months": {k: v for k, v in months.items() if k in keep},
     }
-    tmp = CACHE + ".tmp"
+    # A unique name per process: prayer and weather both write this, and a
+    # shared temp path means whichever renames second finds its file gone.
+    tmp = f"{CACHE}.{os.getpid()}.tmp"
     with open(tmp, "w") as f:
         json.dump(blob, f)
     os.replace(tmp, CACHE)

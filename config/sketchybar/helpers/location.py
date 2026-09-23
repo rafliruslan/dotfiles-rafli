@@ -45,7 +45,9 @@ def _load():
 
 def _save(fix):
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-    tmp = CACHE + ".tmp"
+    # A unique name per process: prayer and weather both write this, and a
+    # shared temp path means whichever renames second finds its file gone.
+    tmp = f"{CACHE}.{os.getpid()}.tmp"
     with open(tmp, "w") as f:
         json.dump(fix, f)
     os.replace(tmp, CACHE)
