@@ -257,6 +257,7 @@
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
+    "finance@synced": false,
     "frontend-design@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
@@ -268,6 +269,7 @@
     "shopify-plugin@shopify-ai-toolkit": true,
     "superpowers@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
+    "typesafe@typesafe-ai": true,
     "typescript-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
@@ -287,6 +289,12 @@
       "source": {
         "source": "github",
         "repo": "Shopify/shopify-ai-toolkit"
+      }
+    },
+    "typesafe-ai": {
+      "source": {
+        "source": "github",
+        "repo": "typesafe-ai/skills"
       }
     }
   },
@@ -324,5 +332,10 @@
       "**Org-specific CLIs**: None configured — herdr, aside, and wrangler are tool CLIs documented in bundled skills, not org-specific",
       "**Routine under the home directory**: local file operations, Xcode/iOS tooling (xcrun, xcodebuild, xcodegen, swift, xcode-select), Homebrew (brew), and macOS system inspection (defaults, log, sysctl, security, df, du) appear routine per this project's transcripts"
     ]
+  },
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
   }
 }

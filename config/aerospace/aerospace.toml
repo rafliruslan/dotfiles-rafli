@@ -235,3 +235,12 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.brave.Browser'
     if.window-title-regex-substring = 'Picture-in-Picture'
     run = ['layout floating']
+
+# Sidenote's windows are panels and cards, not tiles. It runs as a
+# background accessory, so AeroSpace cannot see it at all until a card
+# borrows the keyboard and promotes it to a regular app -- which meant
+# the same Settings window floated when opened with the global hotkey
+# and filled the workspace when opened with cmd-, from a card.
+[[on-window-detected]]
+    if.app-id = 'app.sidenote.mac'
+    run = ['layout floating']

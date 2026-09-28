@@ -1,8 +1,4 @@
 onboarding = false
 
 [ui]
-status_indicators = "symbols"
-
-[theme]
-name = "catppuccin"
-auto_switch = false
+sidebar_collapsed_mode = "compact"

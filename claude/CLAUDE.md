@@ -1,5 +1,8 @@
 # Global Instructions
 
+For Claude (Anthropic tooling) only. Other agents get their own `AGENTS.md`,
+written separately — never link or copy this file into one.
+
 ## Tools
 
 - Aside is available as an MCP (`mcp__aside__repl`) for real-time web browsing, not just
