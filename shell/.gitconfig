@@ -1,21 +1,27 @@
-[user]
-  name = rafliruslan
-  email = rafliruslan@users.noreply.github.com
-
-[includeIf "gitdir:~/personal/"]
-  path = ~/.gitconfig-personal
+# Identity (name, email) and any includeIf rules live in ~/.gitconfig.local,
+# which ./install creates and which is never committed.
 
 [core]
   sshCommand = ssh
 
 [init]
   defaultBranch = main
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
 
-# Machine-local overrides (real email, work identities). Never committed.
+# GitHub over HTTPS through the gh CLI's login, so 'gh auth setup-git' never
+# needs to write here (this file is a symlink into the repo).
+[credential "https://github.com"]
+  helper =
+  helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+  helper =
+  helper = !gh auth git-credential
+
+# Last, so machine-local settings win.
 [include]
   path = ~/.gitconfig.local

@@ -28,8 +28,6 @@ config/nvim/lazy-lock.json
 config/nvim/.luarc.json
 config/nvim/after/queries/
 
-# tmux plugins (managed by TPM)
-config/tmux/plugins/*/
 
 # Shell history and cache
 .zsh_history

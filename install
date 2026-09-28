@@ -1,0 +1,582 @@
+#!/usr/bin/env bash
+# Install these dotfiles, one component at a time.
+#
+#   ./install                 pick components from a checklist
+#   ./install shell herdr     install just these
+#   ./install --all           install everything
+#   ./install --defaults      install the default selection without asking
+#   ./install --dry-run ...   show what would happen, change nothing
+#   ./install --list          list components
+#
+# Safe to re-run: packages already installed are skipped, links already in
+# place are left alone, and anything a link would replace is moved to
+# ~/.dotfiles-backup/<timestamp>/ first.
+#
+# Written for the bash 3.2 that ships with macOS.
+
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+DRY_RUN=0
+BACKED_UP=0
+NOTES=()
+
+# id | on by default | description
+COMPONENTS=(
+  "shell|on|Zsh: Powerlevel10k, fzf, zoxide, eza, bat, thefuck, mise, yazi"
+  "git|on|Git config and global ignore, gh, git-lfs"
+  "neovim|on|Neovim (LazyVim), ripgrep, fd, tree-sitter"
+  "herdr|on|herdr, a terminal multiplexer for AI coding agents"
+  "ghostty|on|Ghostty terminal and JetBrains Mono Nerd Font"
+  "aerospace|on|AeroSpace tiling window manager and window borders"
+  "sketchybar|on|SketchyBar status bar with SF fonts and widgets"
+  "raycast|on|Raycast launcher (app only)"
+  "macos|off|macOS defaults: Dock autohide, Finder bars, fast key repeat"
+  "brave|off|Brave profile launchers that AeroSpace can tile"
+  "claude|off|Claude Code settings, hooks and CLAUDE.md (replaces yours)"
+)
+
+# ---------------------------------------------------------------- output
+
+if [ -t 1 ]; then
+  BOLD=$'\033[1m' DIM=$'\033[2m' GREEN=$'\033[32m' YELLOW=$'\033[33m' RED=$'\033[31m' RESET=$'\033[0m'
+else
+  BOLD="" DIM="" GREEN="" YELLOW="" RED="" RESET=""
+fi
+
+say()     { printf '%s\n' "$*"; }
+step()    { printf '\n%s==> %s%s\n' "$BOLD" "$*" "$RESET"; }
+ok()      { printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$*"; }
+warn()    { printf '  %s!%s %s\n' "$YELLOW" "$RESET" "$*"; }
+die()     { printf '%serror:%s %s\n' "$RED" "$RESET" "$*" >&2; exit 1; }
+note()    { NOTES+=("$*"); }
+
+# Run a command, or only print it under --dry-run.
+run() {
+  if [ "$DRY_RUN" = 1 ]; then
+    printf '  %s+ %s%s\n' "$DIM" "$*" "$RESET"
+  else
+    "$@"
+  fi
+}
+
+# ---------------------------------------------------------------- helpers
+
+tilde() { local t='~'; printf '%s' "${1/#$HOME/$t}"; }
+
+field() { printf '%s' "$1" | cut -d'|' -f"$2"; }
+
+component_ids() {
+  local c
+  for c in "${COMPONENTS[@]}"; do field "$c" 1; echo; done
+}
+
+is_component() {
+  local id
+  for id in $(component_ids); do [ "$id" = "$1" ] && return 0; done
+  return 1
+}
+
+# Move whatever sits at a path into this run's backup folder.
+backup() {
+  local rel="${1#"$HOME"/}"
+  run mkdir -p "$BACKUP_DIR/$(dirname "$rel")"
+  run mv "$1" "$BACKUP_DIR/$rel"
+  BACKED_UP=1
+}
+
+# link <path in repo> <target>: point target at the repo copy.
+link() {
+  local src="$DOTFILES/$1" dst="$2"
+  [ -e "$src" ] || die "missing in repo: $1"
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    ok "$(tilde "$dst") already linked"
+    return
+  fi
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    warn "$(tilde "$dst") exists, backing it up"
+    backup "$dst"
+  fi
+  run mkdir -p "$(dirname "$dst")"
+  run ln -s "$src" "$dst"
+  ok "linked $(tilde "$dst")"
+}
+
+# Remove a link left by an older layout of this repo, if it points here.
+unlink_stale() {
+  local dst="$1"
+  if [ -L "$dst" ] && case "$(readlink "$dst")" in "$DOTFILES"/*) true ;; *) false ;; esac; then
+    run rm "$dst"
+    ok "removed stale link $(tilde "$dst")"
+  fi
+}
+
+# Clone a git repo once; later runs leave it alone.
+clone_once() {
+  local url="$1" dst="$2"
+  if [ -d "$dst/.git" ]; then
+    ok "$(tilde "$dst") already present"
+  else
+    run git clone --quiet --depth 1 "$url" "$dst"
+    ok "cloned $(tilde "$dst")"
+  fi
+}
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+
+# ---------------------------------------------------------------- packages
+# Each component prints Brewfile lines. They are merged and installed in one
+# brew bundle run before any component is set up.
+
+pkgs_shell() {
+  cat <<'EOF'
+brew "powerlevel10k"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "fzf"
+brew "fd"
+brew "bat"
+brew "eza"
+brew "zoxide"
+brew "thefuck"
+brew "mise"
+brew "yazi"
+cask "font-meslo-lg-nerd-font"
+EOF
+}
+
+pkgs_git() {
+  cat <<'EOF'
+brew "git"
+brew "gh"
+brew "git-lfs"
+EOF
+}
+
+pkgs_neovim() {
+  cat <<'EOF'
+brew "neovim"
+brew "tree-sitter-cli"
+brew "ripgrep"
+brew "fd"
+brew "fzf"
+EOF
+}
+
+pkgs_herdr() {
+  echo 'brew "herdr"'
+}
+
+pkgs_ghostty() {
+  cat <<'EOF'
+cask "ghostty"
+cask "font-jetbrains-mono-nerd-font"
+EOF
+}
+
+pkgs_aerospace() {
+  cat <<'EOF'
+tap "nikitabobko/tap"
+tap "felixkratz/formulae"
+cask "nikitabobko/tap/aerospace"
+brew "felixkratz/formulae/borders"
+EOF
+}
+
+pkgs_sketchybar() {
+  cat <<'EOF'
+tap "felixkratz/formulae"
+brew "felixkratz/formulae/sketchybar"
+brew "lua"
+brew "switchaudio-osx"
+brew "nowplaying-cli"
+brew "ical-buddy"
+cask "corelocationcli"
+cask "font-sketchybar-app-font"
+cask "font-jetbrains-mono-nerd-font"
+EOF
+}
+
+pkgs_raycast() {
+  echo 'cask "raycast"'
+}
+
+pkgs_macos()  { :; }
+pkgs_brave()  { :; }
+pkgs_claude() { :; }
+
+# ---------------------------------------------------------------- components
+
+setup_shell() {
+  link shell/.zshrc     "$HOME/.zshrc"
+  link shell/.zprofile  "$HOME/.zprofile"
+  link shell/.zshenv    "$HOME/.zshenv"
+  link shell/.p10k.zsh  "$HOME/.p10k.zsh"
+  link config/thefuck   "$HOME/.config/thefuck"
+  clone_once https://github.com/junegunn/fzf-git.sh.git "$HOME/.local/share/fzf-git.sh"
+
+  if [ ! -f "$HOME/.zshenv.local" ]; then
+    if [ "$DRY_RUN" = 0 ]; then
+      printf '# Machine-local exports and secrets. Never committed.\n' > "$HOME/.zshenv.local"
+      chmod 600 "$HOME/.zshenv.local"
+    fi
+    ok "created ~/.zshenv.local for tokens and machine-local exports"
+  fi
+}
+
+setup_git() {
+  local local_cfg="$HOME/.gitconfig.local"
+
+  # An existing ~/.gitconfig holds the user's own settings (identity, gh's
+  # credential helper). Keep them as the local layer instead of burying them
+  # in the backup folder.
+  if [ -f "$HOME/.gitconfig" ] && [ ! -L "$HOME/.gitconfig" ] && [ ! -e "$local_cfg" ]; then
+    run mv "$HOME/.gitconfig" "$local_cfg"
+    ok "kept your existing ~/.gitconfig as $(tilde "$local_cfg")"
+  fi
+
+  link shell/.gitconfig "$HOME/.gitconfig"
+  link config/git/ignore "$HOME/.config/git/ignore"
+  unlink_stale "$HOME/.gitconfig-personal"
+
+  [ "$DRY_RUN" = 1 ] && return
+  if [ ! -e "$local_cfg" ]; then
+    printf '# Machine-local git settings: identity, includeIf rules. Never committed.\n' > "$local_cfg"
+    ok "created $(tilde "$local_cfg")"
+  fi
+
+  local name email
+  name=$(git config --file "$local_cfg" user.name || true)
+  email=$(git config --file "$local_cfg" user.email || true)
+  if [ -n "$name" ] && [ -n "$email" ]; then
+    ok "git identity: $name <$email>"
+    return
+  fi
+  if [ -t 0 ]; then
+    [ -n "$name" ]  || read -r -p "  Git name:  " name
+    [ -n "$email" ] || read -r -p "  Git email: " email
+  fi
+  [ -n "$name" ]  && git config --file "$local_cfg" user.name "$name"
+  [ -n "$email" ] && git config --file "$local_cfg" user.email "$email"
+  if [ -n "$name" ] && [ -n "$email" ]; then
+    ok "git identity: $name <$email>"
+  else
+    note "Git: set your name and email with 'git config --file ~/.gitconfig.local user.name ...'"
+  fi
+}
+
+setup_neovim() {
+  link config/nvim "$HOME/.config/nvim"
+  link .markdownlint-cli2.yaml "$HOME/.markdownlint-cli2.yaml"
+  if have nvim; then
+    say "  installing Neovim plugins (first run takes a minute)"
+    run nvim --headless "+Lazy! sync" +qa >/dev/null 2>&1 || warn "plugin sync reported errors; open nvim and run :Lazy"
+    ok "Neovim plugins installed"
+  fi
+}
+
+setup_herdr() {
+  # Only config.toml: herdr keeps its sockets, logs and session state in the
+  # same folder, and those must not end up in the repo.
+  link config/herdr/config.toml "$HOME/.config/herdr/config.toml"
+  # Earlier layouts of this repo set up tmux instead.
+  unlink_stale "$HOME/.config/tmux"
+  unlink_stale "$HOME/.tmux.conf"
+  if [ "$DRY_RUN" = 0 ] && have herdr; then
+    if herdr config check >/dev/null 2>&1; then
+      ok "herdr config valid"
+    else
+      warn "herdr config check failed; run 'herdr config check'"
+    fi
+  fi
+  note "herdr: for agent status in panes, run 'herdr integration install claude' (or codex, cursor, ...)"
+}
+
+setup_ghostty() {
+  link config/ghostty "$HOME/.config/ghostty"
+}
+
+setup_aerospace() {
+  link config/aerospace "$HOME/.config/aerospace"
+  link config/borders   "$HOME/.config/borders"
+  run brew services restart borders >/dev/null
+  ok "borders running"
+  note "AeroSpace: allow it in System Settings > Privacy & Security > Accessibility, then open it once"
+}
+
+# SF Symbols glyphs draw the bar's icons, and they only exist in Apple's SF
+# fonts. Homebrew's casks install those system-wide with sudo; unpacking the
+# same packages into ~/Library/Fonts needs no password.
+install_sf_fonts() {
+  if [ -f "$HOME/Library/Fonts/SF-Pro.ttf" ] || [ -f /Library/Fonts/SF-Pro.ttf ]; then
+    ok "SF fonts already installed"
+    return
+  fi
+  if [ "$DRY_RUN" = 1 ]; then
+    run "unpack font-sf-pro and sf-symbols into ~/Library/Fonts"
+    return
+  fi
+  say "  unpacking SF Pro and SF Symbols fonts into ~/Library/Fonts"
+  local tmp cask dmg mnt pkg payload
+  tmp=$(mktemp -d)
+  for cask in font-sf-pro sf-symbols; do
+    brew fetch --quiet --cask "$cask" >/dev/null
+    dmg=$(brew --cache --cask "$cask")
+    mnt=$(hdiutil attach -nobrowse -readonly "$dmg" 2>/dev/null | awk -F'\t' '/\/Volumes\//{print $NF}')
+    cp "$mnt"/*.pkg "$tmp/"
+    hdiutil detach -quiet "$mnt"
+  done
+  for pkg in "$tmp"/*.pkg; do
+    mkdir "$pkg.x"
+    (cd "$pkg.x" && xar -xf "$pkg")
+  done
+  find "$tmp" -name Payload -type f | while read -r payload; do
+    mkdir -p "$payload.d"
+    (cd "$payload.d" && gunzip -dc "$payload" | cpio -id --quiet)
+  done
+  mkdir -p "$HOME/Library/Fonts"
+  find "$tmp" -path '*/Library/Fonts/*' \( -name '*.otf' -o -name '*.ttf' \) \
+    -exec cp -n {} "$HOME/Library/Fonts/" \;
+  rm -rf "$tmp"
+  ok "SF fonts installed"
+}
+
+# The Lua config loads SketchyBar's Lua module, which Homebrew does not package.
+install_sbarlua() {
+  if [ -f "$HOME/.local/share/sketchybar_lua/sketchybar.so" ]; then
+    ok "SbarLua already installed"
+    return
+  fi
+  if [ "$DRY_RUN" = 1 ]; then
+    run "build https://github.com/FelixKratz/SbarLua into ~/.local/share/sketchybar_lua"
+    return
+  fi
+  local tmp
+  tmp=$(mktemp -d)
+  git clone --quiet --depth 1 https://github.com/FelixKratz/SbarLua.git "$tmp/SbarLua"
+  (cd "$tmp/SbarLua" && make install >/dev/null)
+  rm -rf "$tmp"
+  ok "SbarLua installed"
+}
+
+setup_sketchybar() {
+  link config/sketchybar "$HOME/.config/sketchybar"
+  install_sbarlua
+  install_sf_fonts
+  # Restart, not reload: a running bar does not see fonts installed after it started.
+  run brew services restart sketchybar >/dev/null
+  ok "SketchyBar running"
+  note "SketchyBar: allow CoreLocationCLI in System Settings > Privacy & Security > Location Services (prayer and weather widgets). Run 'CoreLocationCLI --json' once if it is not listed."
+}
+
+setup_raycast() {
+  ok "Raycast installed; its settings are not synced by this repo"
+}
+
+setup_macos() {
+  run defaults write com.apple.dock autohide -bool true
+  run defaults write com.apple.dock autohide-delay -float 0
+  run defaults write com.apple.dock autohide-time-modifier -float 0.3
+  run defaults write com.apple.finder ShowPathbar -bool true
+  run defaults write com.apple.finder ShowStatusBar -bool true
+  run defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+  run defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+  run defaults write NSGlobalDomain KeyRepeat -int 1
+  run defaults write NSGlobalDomain InitialKeyRepeat -int 10
+  run killall Dock Finder >/dev/null 2>&1 || true
+  ok "macOS defaults applied"
+  note "macOS: log out and back in for the key repeat change"
+}
+
+# A Dock or Spotlight launch of Brave passes no --user-data-dir, so it starts a
+# second browser on the stock profile. Two processes then share one bundle id,
+# AeroSpace tracks only the first, and the second's windows are never tiled.
+# These shims make every launch carry the same flags. Copied, not linked: the
+# Dock resolves a tile by bundle path.
+setup_brave() {
+  local icon="/Applications/Brave Browser.app/Contents/Resources/app.icns"
+  local lsregister="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+  [ -d "/Applications/Brave Browser.app" ] || warn "Brave is not installed; the launchers need it"
+
+  local name src dst
+  for name in "Brave Personal" "Brave Work"; do
+    src="$DOTFILES/applications/$name.app"
+    dst="$HOME/Applications/$name.app"
+    run rm -rf "$dst"
+    run mkdir -p "$dst/Contents/Resources"
+    run cp "$src/Contents/Info.plist" "$dst/Contents/Info.plist"
+    run cp -R "$src/Contents/MacOS" "$dst/Contents/"
+    run chmod +x "$dst/Contents/MacOS/"*
+    [ -f "$icon" ] && run cp "$icon" "$dst/Contents/Resources/app.icns"
+    [ -x "$lsregister" ] && run "$lsregister" -f "$dst"
+    ok "installed ~/Applications/$name.app"
+  done
+  link local/bin/brave "$HOME/.local/bin/brave"
+}
+
+setup_claude() {
+  link claude/CLAUDE.md     "$HOME/.claude/CLAUDE.md"
+  link claude/settings.json "$HOME/.claude/settings.json"
+  link claude/hooks         "$HOME/.claude/hooks"
+}
+
+# ---------------------------------------------------------------- selection
+
+SELECTED=()
+
+select_defaults() {
+  local c
+  SELECTED=()
+  for c in "${COMPONENTS[@]}"; do
+    [ "$(field "$c" 2)" = on ] && SELECTED+=("$(field "$c" 1)")
+  done
+  return 0
+}
+
+select_all() {
+  SELECTED=()
+  local id
+  for id in $(component_ids); do SELECTED+=("$id"); done
+}
+
+is_selected() {
+  local s
+  for s in ${SELECTED[@]+"${SELECTED[@]}"}; do [ "$s" = "$1" ] && return 0; done
+  return 1
+}
+
+toggle() {
+  local s keep=()
+  if is_selected "$1"; then
+    for s in "${SELECTED[@]}"; do [ "$s" = "$1" ] || keep+=("$s"); done
+    SELECTED=(${keep[@]+"${keep[@]}"})
+  else
+    SELECTED+=("$1")
+  fi
+}
+
+list_components() {
+  local c
+  for c in "${COMPONENTS[@]}"; do
+    printf '  %-11s %s%s%s\n' "$(field "$c" 1)" "$(field "$c" 3)" \
+      "$DIM" "$([ "$(field "$c" 2)" = on ] && echo "" || echo "  (off by default)")$RESET"
+  done
+}
+
+menu() {
+  select_defaults
+  local c i n answer tok id
+  while true; do
+    printf '\n%sChoose what to install%s\n\n' "$BOLD" "$RESET"
+    i=0
+    for c in "${COMPONENTS[@]}"; do
+      i=$((i + 1))
+      id=$(field "$c" 1)
+      if is_selected "$id"; then mark="${GREEN}[x]${RESET}"; else mark="[ ]"; fi
+      printf '  %2d %s %-11s %s%s%s\n' "$i" "$mark" "$id" "$DIM" "$(field "$c" 3)" "$RESET"
+    done
+    n=$i
+    printf '\nNumbers toggle (e.g. "2 9"), a = all, n = none, Enter = install, q = quit: '
+    read -r answer || exit 1
+    case "$answer" in
+      "") break ;;
+      q|Q) exit 0 ;;
+      a|A) select_all ;;
+      n|N) SELECTED=() ;;
+      *)
+        for tok in $answer; do
+          case "$tok" in
+            *[!0-9]*) warn "not a number: $tok" ;;
+            *)
+              if [ "$tok" -ge 1 ] && [ "$tok" -le "$n" ]; then
+                toggle "$(field "${COMPONENTS[$((tok - 1))]}" 1)"
+              else
+                warn "no component $tok"
+              fi ;;
+          esac
+        done ;;
+    esac
+  done
+}
+
+# ---------------------------------------------------------------- main
+
+usage() { sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; }
+
+main() {
+  local mode=menu arg
+  for arg in "$@"; do
+    case "$arg" in
+      -h|--help) usage; exit 0 ;;
+      --list) list_components; exit 0 ;;
+      --dry-run|-n) DRY_RUN=1 ;;
+      --all) mode=all ;;
+      --defaults|-y) mode=defaults ;;
+      -*) die "unknown option: $arg (see --help)" ;;
+      *) is_component "$arg" || die "unknown component: $arg (see --list)"
+         mode=args; SELECTED+=("$arg") ;;
+    esac
+  done
+
+  [ "$(uname -s)" = Darwin ] || die "these dotfiles are for macOS"
+
+  case "$mode" in
+    all) select_all ;;
+    defaults) select_defaults ;;
+    menu)
+      [ -t 0 ] || die "no terminal for the checklist; name components or pass --defaults"
+      menu ;;
+  esac
+  [ ${#SELECTED[@]} -gt 0 ] || { say "Nothing selected."; exit 0; }
+
+  [ "$DRY_RUN" = 1 ] && say "${YELLOW}Dry run: nothing will be changed.${RESET}"
+  say "Installing: ${SELECTED[*]}"
+
+  # Homebrew
+  if ! have brew; then
+    [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+  if ! have brew; then
+    step "Installing Homebrew"
+    run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    [ "$DRY_RUN" = 1 ] || eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+
+  # Packages, all in one bundle
+  local brewfile id tap
+  brewfile=$(for id in "${SELECTED[@]}"; do "pkgs_$id"; done | awk '!seen[$0]++')
+  if [ -n "$brewfile" ]; then
+    step "Packages"
+    # Newer Homebrew refuses formulae from third-party taps until trusted.
+    for tap in $(printf '%s\n' "$brewfile" | sed -n 's/^tap "\(.*\)"$/\1/p'); do
+      run brew tap "$tap" >/dev/null
+      if brew help trust >/dev/null 2>&1; then run brew trust "$tap" >/dev/null; fi
+    done
+    if [ "$DRY_RUN" = 1 ]; then
+      printf '%s\n' "$brewfile" | sed "s/^/  $DIM+ /;s/\$/$RESET/"
+    else
+      printf '%s\n' "$brewfile" | brew bundle --file=- || warn "some packages failed; re-run to retry"
+    fi
+  fi
+
+  for id in "${SELECTED[@]}"; do
+    step "$id"
+    "setup_$id"
+  done
+
+  # Repo hygiene: refuse commits that carry credentials.
+  git -C "$DOTFILES" config core.hooksPath scripts/hooks
+
+  step "Done"
+  [ "$BACKED_UP" = 1 ] && say "  Replaced files were moved to $(tilde "$BACKUP_DIR")"
+  if [ ${#NOTES[@]} -gt 0 ]; then
+    say "  If you have not done these yet:"
+    local n
+    for n in "${NOTES[@]}"; do say "   - $n"; done
+  fi
+  say "  Open a new terminal to load the shell changes."
+}
+
+main "$@"
