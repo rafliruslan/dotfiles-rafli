@@ -160,7 +160,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '/Users/me/.claude/hooks/herdr-agent-state.sh' session",
+            "command": "bash ~/.claude/hooks/herdr-agent-state.sh session",
             "timeout": 10
           }
         ]
@@ -244,7 +244,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "/Users/me/.claude/xirp-statusline-wrapper.sh"
+    "command": "~/.claude/xirp-statusline-wrapper.sh"
   },
   "enabledPlugins": {
     "adapty-sdk-integration@adapty": true,
@@ -280,7 +280,7 @@
     "build-ios-apps-local": {
       "source": {
         "source": "directory",
-        "path": "/Users/me/.claude/local-marketplaces/build-ios-apps"
+        "path": "~/.claude/local-marketplaces/build-ios-apps"
       }
     },
     "shopify-ai-toolkit": {
@@ -319,10 +319,10 @@
       "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "### User-specific",
-      "**Primary use of Claude Code**: software development, with heavy use of design/brand skill work (client), Cloudflare Workers/Turnstile/email tooling, browser automation (Aside), and iOS tooling (xcrun, xcodebuild, xcodegen) per this project's transcripts",
-      "**Trusted repo**: The git repository the agent started in (/Users/me), which has no tracked files and no configured remote — treat as an empty/unestablished repo; no push destination exists yet",
+      "**Primary use of Claude Code**: software development, with heavy use of design/brand skill work, Cloudflare Workers/Turnstile/email tooling, browser automation (Aside), and iOS tooling (xcrun, xcodebuild, xcodegen) per this project's transcripts",
+      "**Trusted repo**: The git repository the agent started in (the home directory), which has no tracked files and no configured remote — treat as an empty/unestablished repo; no push destination exists yet",
       "**Org-specific CLIs**: None configured — herdr, aside, and wrangler are tool CLIs documented in bundled skills, not org-specific",
-      "**Routine under /Users/me/ prefix**: local file operations, Xcode/iOS tooling (xcrun, xcodebuild, xcodegen, swift, xcode-select), Homebrew (brew), and macOS system inspection (defaults, log, sysctl, security, df, du) appear routine per this project's transcripts"
+      "**Routine under the home directory**: local file operations, Xcode/iOS tooling (xcrun, xcodebuild, xcodegen, swift, xcode-select), Homebrew (brew), and macOS system inspection (defaults, log, sysctl, security, df, du) appear routine per this project's transcripts"
     ]
   }
 }

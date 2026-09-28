@@ -101,9 +101,6 @@ id_ed25519*
 # Plan document
 DOTFILES_PLAN.md
 
-# Work identity - this repo is public
-shell/.gitconfig-work
-
 # Installed Claude skills are third-party and re-installable, like node_modules
 claude/skills/
 

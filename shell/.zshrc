@@ -101,19 +101,15 @@ function y() {
 }
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/me/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
 
 export PATH=$PATH:~/bin
 
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/me/.docker/completions $fpath)
+fpath=($HOME/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
-
-# ---- HeroUI Pro CI/CD token ----
-# Token is exported from ~/.zshenv so it's also available in non-interactive
-# shells (CI, ssh-spawned, IDE integrations). Don't duplicate it here.
 
 # ---- Zoxide (better cd) ----
 # Must be the LAST thing in .zshrc
@@ -128,4 +124,3 @@ if [ -n "$MOSHI_CLIENT" ]; then
   : # add Moshi-specific overrides here (e.g. simpler P10k segments)
 fi
 eval "$(mise activate zsh)"
-export AWS_PROFILE=work-staging

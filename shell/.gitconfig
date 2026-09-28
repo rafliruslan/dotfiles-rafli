@@ -5,9 +5,6 @@
 [includeIf "gitdir:~/personal/"]
   path = ~/.gitconfig-personal
 
-[includeIf "gitdir/i:~/work/"]
-  path = ~/.gitconfig-work
-
 [core]
   sshCommand = ssh
 
@@ -18,3 +15,7 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
+# Machine-local overrides (real email, work identities). Never committed.
+[include]
+  path = ~/.gitconfig.local
