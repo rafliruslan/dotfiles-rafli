@@ -39,6 +39,7 @@ cask "raycast"
 # SketchyBar status bar (the Lua config also needs SbarLua, which is not
 # packaged: https://github.com/FelixKratz/SbarLua)
 brew "felixkratz/formulae/sketchybar"
+cask "corelocationcli"  # location for the prayer and weather widgets
 brew "lua"
 
 # Additional useful tools for development
