@@ -192,16 +192,24 @@ default_orientation = "perpendicular"
 [settings.layout.gaps.outer]
 # Copied from AeroSpace. SketchyBar is 40px tall, so windows start at y=50.
 # This is the external-display value; the built-in screen needs top = 18
-# (AeroSpace sets it per monitor), which wants a per_display override keyed
-# by that display's UUID once it is attached: `rift-cli query displays`.
+# (AeroSpace sets it per monitor), set below in a per_display override keyed
+# by that display's UUID (`rift-cli query displays`).
 top = 50
 left = 10
 bottom = 10
-right = 26
+right = 10
 
 [settings.layout.gaps.inner]
 horizontal = 10
 vertical = 10
+
+# The MacBook Air's built-in display. macOS already keeps the ~32pt notch band
+# out of its frame, so 18 more lands windows at y=50 like the external value.
+[settings.layout.gaps.per_display."37D8832A-2D66-02CA-B9F7-8F30A301B230".outer]
+top = 18
+left = 10
+bottom = 10
+right = 10
 
 # Example per-display overrides:
 # Replace the quoted key with your display's UUID. Only specify values you want to override.
