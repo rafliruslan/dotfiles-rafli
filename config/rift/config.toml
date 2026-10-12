@@ -135,7 +135,7 @@ column_width_ratio = 0.7
 preserve_window_sizes = false
 # Fill the usable width when only one scrolling column remains, including stacks.
 # Its stored width returns when another column is added. Window constraints still apply.
-expand_single_column = false
+expand_single_column = true
 # min_column_width_ratio / max_column_width_ratio: clamp bounds used by resize commands
 min_column_width_ratio = 0.3
 max_column_width_ratio = 0.9
@@ -570,6 +570,10 @@ comb1 = "Alt + Shift"
 "Alt + F" = "toggle_fullscreen"
 "Alt + Shift + F" = "toggle_fullscreen_within_gaps"
 "comb1 + Ctrl + Space" = "toggle_focus_floating" # briefly bring focus to floating window
+# Restart rift through launchd, for when it stops acting on keys ("no active
+# spaces" in /tmp/rift_$USER.err.log). kickstart -k kills and relaunches the
+# service in one request, so it completes even though this shell is rift's child.
+"Alt + Shift + R" = { exec = ["/bin/sh", "-c", "launchctl kickstart -k gui/$(id -u)/git.acsandmann.rift"] }
 
 # smartly resize windows
 "Alt + Equal" = "resize_window_grow"
