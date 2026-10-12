@@ -41,6 +41,7 @@ alone, and any file a link would replace is moved to
 | `raycast`    | on  | Raycast (the app only; its settings are not synced) |
 | `macos`      | off | Dock autohide, Finder path and status bars, fast key repeat |
 | `brave`      | off | Brave profile launchers that AeroSpace can tile (needs Brave) |
+| `rift`       | off | rift, a scrolling (niri-style) window manager, and `wm` to switch between it and AeroSpace |
 | `claude`     | off | Claude Code `settings.json`, hooks and `CLAUDE.md`. Replaces yours |
 
 ## After installing
@@ -50,6 +51,10 @@ alone, and any file a link would replace is moved to
   for the prayer-times and weather widgets. If it is not listed, run
   `CoreLocationCLI --json` once to get the prompt.
 - **macos component:** log out and back in for the key repeat change.
+- **rift component:** nothing starts on its own, because rift and AeroSpace
+  cannot run together. Turn on Displays have separate Spaces (Desktop & Dock →
+  Mission Control), allow rift under Accessibility, then `wm rift`. `wm aerospace`
+  switches back; the bar's workspace widget follows whichever is running.
 - **herdr:** `herdr integration install claude` (or another agent) shows agent
   status in its panes.
 
@@ -69,10 +74,10 @@ they contain credentials.
 ```text
 install                  the installer
 config/                  linked into ~/.config/<name>
-  aerospace/ borders/ ghostty/ git/ herdr/ nvim/ sketchybar/ thefuck/
+  aerospace/ borders/ ghostty/ git/ herdr/ nvim/ rift/ sketchybar/ thefuck/
 shell/                   linked into ~ (.zshrc, .zprofile, .zshenv, .p10k.zsh, .gitconfig)
 claude/                  Claude Code config (claude component)
-applications/, local/    Brave launchers (brave component)
+applications/, local/    Brave launchers (brave), and the wm switcher (rift)
 scripts/                 secret scan and git hooks
 ```
 

@@ -34,6 +34,7 @@ COMPONENTS=(
   "raycast|on|Raycast launcher (app only)"
   "macos|off|macOS defaults: Dock autohide, Finder bars, fast key repeat"
   "brave|off|Brave profile launchers that AeroSpace can tile"
+  "rift|off|rift scrolling window manager, plus wm to switch from AeroSpace"
   "claude|off|Claude Code settings, hooks and CLAUDE.md (replaces yours)"
 )
 
@@ -205,6 +206,13 @@ pkgs_raycast() {
 
 pkgs_macos()  { :; }
 pkgs_brave()  { :; }
+
+pkgs_rift() {
+  cat <<'EOF'
+tap "acsandmann/tap"
+brew "acsandmann/tap/rift"
+EOF
+}
 pkgs_claude() { :; }
 
 # ---------------------------------------------------------------- components
@@ -414,6 +422,16 @@ setup_brave() {
     ok "installed ~/Applications/$name.app"
   done
   link local/bin/brave "$HOME/.local/bin/brave"
+}
+
+# rift is a trial alongside AeroSpace, not a replacement, so this links its
+# config and the switcher but starts nothing: two window managers cannot drive
+# the same windows. `wm rift` stops AeroSpace and starts rift; `wm aerospace`
+# goes back.
+setup_rift() {
+  link config/rift      "$HOME/.config/rift"
+  link local/bin/wm     "$HOME/.local/bin/wm"
+  note "rift: turn on Displays have separate Spaces (Desktop & Dock > Mission Control), allow rift under Accessibility, then run: wm rift"
 }
 
 setup_claude() {

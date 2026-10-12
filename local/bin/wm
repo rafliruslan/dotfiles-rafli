@@ -1,0 +1,49 @@
+#!/bin/sh
+# Switch between AeroSpace and rift. Two window managers cannot drive the same
+# windows at once, so starting one always stops the other first.
+#
+#   wm rift        stop AeroSpace, start rift
+#   wm aerospace   stop rift (and remove its login item), start AeroSpace
+#   wm             show which one is running
+#
+# rift's service is uninstalled on the way back so it cannot start at login
+# alongside AeroSpace, which has start-at-login = true.
+
+wait_gone() {  # wait up to 5s for a process pattern to exit
+    i=0
+    while pgrep -f "$1" >/dev/null 2>&1 && [ $i -lt 50 ]; do
+        sleep 0.1; i=$((i + 1))
+    done
+}
+
+status() {
+    pgrep -f 'MacOS/AeroSpace' >/dev/null && echo "running: AeroSpace"
+    pgrep -x rift >/dev/null && echo "running: rift"
+    pgrep -f 'MacOS/AeroSpace' >/dev/null || pgrep -x rift >/dev/null || echo "running: neither"
+}
+
+case "$1" in
+    rift)
+        osascript -e 'quit app "AeroSpace"' >/dev/null 2>&1
+        wait_gone 'MacOS/AeroSpace'
+        pkill -f 'MacOS/AeroSpace' 2>/dev/null
+        rift service install >/dev/null 2>&1
+        rift service start
+        ;;
+    aerospace)
+        rift service stop >/dev/null 2>&1
+        rift service uninstall >/dev/null 2>&1
+        wait_gone '^rift$'
+        open -a AeroSpace
+        ;;
+    "")
+        ;;
+    *)
+        echo "usage: wm [rift|aerospace]" >&2
+        exit 2
+        ;;
+esac
+# The bar picks its workspace widget at load (items/init.lua), so reload it
+# whenever the window manager changes.
+[ -n "$1" ] && sketchybar --reload
+status
