@@ -81,7 +81,7 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     # already set to auto-hide (_HIHideMenuBar = 1). So the built-in needs
     # only 18 to land at y=50; external displays reserve nothing -> 50.
     outer.top =        [{ monitor."built-in" = 18 }, 50]
-    outer.right =      26
+    outer.right =      10
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
