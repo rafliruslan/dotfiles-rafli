@@ -6,8 +6,17 @@
 #   wm aerospace   stop rift (and remove its login item), start AeroSpace
 #   wm             show which one is running
 #
-# rift's service is uninstalled on the way back so it cannot start at login
-# alongside AeroSpace, which has start-at-login = true.
+# Only the one you pick starts at login. rift's login item is its launchd
+# service, installed and removed here. AeroSpace's is driven by start-at-login
+# in its config: AeroSpace adds or removes its own login item to match whenever
+# it loads that config, so flip the setting and reload before quitting it.
+# While rift is picked, aerospace.toml therefore shows start-at-login = false.
+
+AEROSPACE_TOML="$HOME/.config/aerospace/aerospace.toml"
+
+aerospace_at_login() {  # true | false
+    sed -i '' "s/^start-at-login = .*/start-at-login = $1/" "$AEROSPACE_TOML"
+}
 
 wait_gone() {  # wait up to 5s for a process pattern to exit
     i=0
@@ -24,6 +33,8 @@ status() {
 
 case "$1" in
     rift)
+        aerospace_at_login false
+        pgrep -f 'MacOS/AeroSpace' >/dev/null && aerospace reload-config >/dev/null 2>&1
         osascript -e 'quit app "AeroSpace"' >/dev/null 2>&1
         wait_gone 'MacOS/AeroSpace'
         pkill -f 'MacOS/AeroSpace' 2>/dev/null
@@ -34,6 +45,7 @@ case "$1" in
         rift service stop >/dev/null 2>&1
         rift service uninstall >/dev/null 2>&1
         wait_gone '^rift$'
+        aerospace_at_login true
         open -a AeroSpace
         ;;
     "")
