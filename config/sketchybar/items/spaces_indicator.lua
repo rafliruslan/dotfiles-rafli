@@ -27,10 +27,12 @@ local spaces_indicator = sbar.add("item", {
   }
 })
 
-spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
-  local currently_on = spaces_indicator:query().icon.value == icons.switch.on
+-- Follows the swap's outcome, not the click: items/menus.lua refuses the swap
+-- when the front app has no menus, and then the switch should not flip.
+spaces_indicator:subscribe("menus_toggled", function(_)
+  local showing_menus = sbar.query("menu.1").geometry.drawing == "on"
   spaces_indicator:set({
-    icon = currently_on and icons.switch.off or icons.switch.on
+    icon = showing_menus and icons.switch.off or icons.switch.on
   })
 end)
 

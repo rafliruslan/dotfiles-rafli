@@ -1,4 +1,6 @@
 #include <Carbon/Carbon.h>
+#include <objc/message.h>
+#include <objc/runtime.h>
 
 void ax_init() {
   const void *keys[] = { kAXTrustedCheckOptionPrompt };
@@ -79,10 +81,13 @@ void ax_print_menu_options(AXUIElementRef app) {
         CFTypeRef title = ax_get_title(item);
 
         if (title) {
-          uint32_t buffer_len = 2*CFStringGetLength(title);
-          char buffer[2*CFStringGetLength(title)];
-          CFStringGetCString(title, buffer, buffer_len, kCFStringEncodingUTF8);
-          printf("%s\n", buffer);
+          CFIndex buffer_len = CFStringGetMaximumSizeForEncoding(
+                                 CFStringGetLength(title),
+                                 kCFStringEncodingUTF8     ) + 1;
+          char buffer[buffer_len];
+          if (CFStringGetCString(title, buffer, buffer_len,
+                                 kCFStringEncodingUTF8     ))
+            printf("%s\n", buffer);
           CFRelease(title);
         }
       }
@@ -213,14 +218,37 @@ void ax_select_menu_extra(char* alias) {
 extern void _SLPSGetFrontProcess(ProcessSerialNumber* psn);
 extern void SLSGetConnectionIDForPSN(int cid, ProcessSerialNumber* psn, int* cid_out);
 extern void SLSConnectionGetPID(int cid, pid_t* pid_out);
-AXUIElementRef ax_get_front_app() {
+
+// The app whose menus are in the menu bar. The window server's front process
+// is not always that app: it can be loginwindow or another faceless process,
+// which has no menu bar, so ask AppKit first and fall back to the window server.
+pid_t menu_bar_owner_pid() {
+  id workspace = ((id (*)(Class, SEL))objc_msgSend)(
+                   objc_getClass("NSWorkspace"),
+                   sel_registerName("sharedWorkspace"));
+  id app = ((id (*)(id, SEL))objc_msgSend)(
+             workspace,
+             sel_registerName("menuBarOwningApplication"));
+  if (app) {
+    pid_t pid = ((pid_t (*)(id, SEL))objc_msgSend)(
+                  app,
+                  sel_registerName("processIdentifier"));
+    if (pid > 0) return pid;
+  }
+
   ProcessSerialNumber psn;
   _SLPSGetFrontProcess(&psn);
   int target_cid;
   SLSGetConnectionIDForPSN(SLSMainConnectionID(), &psn, &target_cid);
 
-  pid_t pid;
+  pid_t pid = 0;
   SLSConnectionGetPID(target_cid, &pid);
+  return pid;
+}
+
+AXUIElementRef ax_get_front_app() {
+  pid_t pid = menu_bar_owner_pid();
+  if (pid <= 0) return NULL;
   return AXUIElementCreateApplication(pid);
 }
 

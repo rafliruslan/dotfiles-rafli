@@ -11,6 +11,7 @@ local space_menu_swap = sbar.add("item", {
   updates = true,
 })
 sbar.add("event", "swap_menus_and_spaces")
+sbar.add("event", "menus_toggled")
 
 local max_items = 15
 local menu_items = {}
@@ -42,34 +43,56 @@ local menu_padding = sbar.add("item", "menu.padding", {
   width = 5
 })
 
-local function update_menus(env)
+-- Fills the menu items from the front app's menu bar, then calls on_shown if
+-- any came back. An empty list (no front app, or one with no menu bar) leaves
+-- the bar as it is: hiding the workspaces with nothing to put in their place
+-- would leave that end of the bar blank.
+local function update_menus(on_shown)
   sbar.exec("$CONFIG_DIR/helpers/menus/bin/menus -l", function(menus)
-    sbar.set('/menu\\..*/', { drawing = false })
-    menu_padding:set({ drawing = true })
-    id = 1
-    for menu in string.gmatch(menus, '[^\r\n]+') do
-      if id < max_items then
-        menu_items[id]:set( { label = menu, drawing = true } )
-      else break end
-      id = id + 1
+    local names = {}
+    for menu in string.gmatch(menus or "", '[^\r\n]+') do
+      if #names >= max_items then break end
+      names[#names + 1] = menu
     end
+    if #names == 0 then return end
+
+    for i = 1, max_items do
+      if names[i] then
+        menu_items[i]:set({ label = names[i], drawing = true })
+      else
+        menu_items[i]:set({ drawing = false })
+      end
+    end
+    menu_padding:set({ drawing = true })
+    if on_shown then on_shown() end
   end)
 end
 
-menu_watcher:subscribe("front_app_switched", update_menus)
+local showing_menus = false
 
-space_menu_swap:subscribe("swap_menus_and_spaces", function(env)
-  local drawing = menu_items[1]:query().geometry.drawing == "on"
-  if drawing then
-    menu_watcher:set( { updates = false })
+menu_watcher:subscribe("front_app_switched", function(_)
+  update_menus()
+end)
+
+space_menu_swap:subscribe("swap_menus_and_spaces", function(_)
+  if showing_menus then
+    showing_menus = false
+    menu_watcher:set({ updates = false })
     sbar.set("/menu\\..*/", { drawing = false })
     sbar.set("/space\\..*/", { drawing = true })
     sbar.set("front_app", { drawing = true })
+    -- Rift hides its empty workspaces; the line above just drew all nine, so
+    -- have items/rift.lua redraw them. Nothing listens to this under AeroSpace.
+    sbar.trigger("rift_workspace_changed")
+    sbar.trigger("menus_toggled")
   else
-    menu_watcher:set( { updates = true })
-    sbar.set("/space\\..*/", { drawing = false })
-    sbar.set("front_app", { drawing = false })
-    update_menus()
+    update_menus(function()
+      showing_menus = true
+      menu_watcher:set({ updates = true })
+      sbar.set("/space\\..*/", { drawing = false })
+      sbar.set("front_app", { drawing = false })
+      sbar.trigger("menus_toggled")
+    end)
   end
 end)
 
