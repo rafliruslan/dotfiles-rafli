@@ -550,10 +550,12 @@ comb1 = "Alt + Shift"
 # "Alt + Ctrl + 3" = { set_workspace_layout = { mode = "master_stack" } }
 # "Alt + Ctrl + 4" = { set_workspace_layout = { mode = "scrolling" } }
 
-"Alt + Shift + Left" = { join_window = "left" }
-"Alt + Shift + Right" = { join_window = "right" }
-"Alt + Shift + Up" = { join_window = "up" }
-"Alt + Shift + Down" = { join_window = "down" }
+# Merging windows uses Alt+Ctrl+arrows, not rift's default Alt+Shift+arrows:
+# apps use those to select text by word and by paragraph.
+"Alt + Ctrl + Left" = { join_window = "left" }
+"Alt + Ctrl + Right" = { join_window = "right" }
+"Alt + Ctrl + Up" = { join_window = "up" }
+"Alt + Ctrl + Down" = { join_window = "down" }
 "Alt + Comma" = "toggle_stack"
 # Scrolling layout: cycle the focused column through preset widths, and
 # bring it to the middle of the screen.
@@ -592,6 +594,7 @@ comb1 = "Alt + Shift"
 # "Alt + Shift + F" = { focus_display = "right" }
 
 # Move a window to a display (by index, UUID, or direction)
+# Alt+Ctrl+arrows now merge windows; pick other keys to enable these.
 # "Alt + Ctrl + Up" = { move_window_to_display = { selector = "up" } }
 # "Alt + Ctrl + Down" = { move_window_to_display = { selector = "down" } }
 # "Alt + Ctrl + Left" = { move_window_to_display = { selector = "left" } }
