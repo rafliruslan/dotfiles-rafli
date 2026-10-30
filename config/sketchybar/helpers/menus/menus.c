@@ -203,16 +203,60 @@ extern int SLSMainConnectionID();
 extern void SLSSetMenuBarVisibilityOverrideOnDisplay(int cid, int did, bool enabled);
 extern void SLSSetMenuBarVisibilityOverrideOnDisplay(int cid, int did, bool enabled);
 extern void SLSSetMenuBarInsetAndAlpha(int cid, double u1, double u2, float alpha);
-void ax_select_menu_extra(char* alias) {
-  AXUIElementRef item = ax_get_extra_menu_item(alias);
-  if (!item) return;
+void ax_click_menu_extra(AXUIElementRef item) {
   SLSSetMenuBarInsetAndAlpha(SLSMainConnectionID(), 0, 1, 0.0);
   SLSSetMenuBarVisibilityOverrideOnDisplay(SLSMainConnectionID(), 0, true);
   SLSSetMenuBarInsetAndAlpha(SLSMainConnectionID(), 0, 1, 0.0);
   ax_perform_click(item);
   SLSSetMenuBarVisibilityOverrideOnDisplay(SLSMainConnectionID(), 0, false);
   SLSSetMenuBarInsetAndAlpha(SLSMainConnectionID(), 0, 1, 1.0);
+}
+
+void ax_select_menu_extra(char* alias) {
+  AXUIElementRef item = ax_get_extra_menu_item(alias);
+  if (!item) return;
+  ax_click_menu_extra(item);
   CFRelease(item);
+}
+
+// Clicks the first menu bar icon of the app with this bundle id. Unlike an
+// alias, this needs no window names, so it works without Screen Recording.
+void ax_select_app_menu_extra(char* bundle_id) {
+  CFStringRef id_ref = CFStringCreateWithCString(NULL,
+                                                 bundle_id,
+                                                 kCFStringEncodingUTF8);
+  if (!id_ref) return;
+  id apps = ((id (*)(Class, SEL, CFStringRef))objc_msgSend)(
+              objc_getClass("NSRunningApplication"),
+              sel_registerName("runningApplicationsWithBundleIdentifier:"),
+              id_ref);
+  CFRelease(id_ref);
+  id app = apps ? ((id (*)(id, SEL))objc_msgSend)(
+                    apps,
+                    sel_registerName("firstObject")) : NULL;
+  if (!app) return;
+  pid_t pid = ((pid_t (*)(id, SEL))objc_msgSend)(
+                app,
+                sel_registerName("processIdentifier"));
+
+  AXUIElementRef ax_app = AXUIElementCreateApplication(pid);
+  if (!ax_app) return;
+  CFTypeRef extras = NULL;
+  CFArrayRef children_ref = NULL;
+  if (AXUIElementCopyAttributeValue(ax_app,
+                                    kAXExtrasMenuBarAttribute,
+                                    &extras) == kAXErrorSuccess) {
+    if (AXUIElementCopyAttributeValue(extras,
+                                      kAXChildrenAttribute,
+                                      (CFTypeRef*)&children_ref)
+          == kAXErrorSuccess
+        && CFArrayGetCount(children_ref) > 0) {
+      ax_click_menu_extra(CFArrayGetValueAtIndex(children_ref, 0));
+    }
+    if (children_ref) CFRelease(children_ref);
+    CFRelease(extras);
+  }
+  CFRelease(ax_app);
 }
 
 extern void _SLPSGetFrontProcess(ProcessSerialNumber* psn);
@@ -254,7 +298,7 @@ AXUIElementRef ax_get_front_app() {
 
 int main (int argc, char **argv) {
   if (argc == 1) {
-    printf("Usage: %s [-l | -s id/alias ]\n", argv[0]);
+    printf("Usage: %s [-l | -s id/alias | -b bundle_id ]\n", argv[0]);
     exit(0);
   }
   ax_init();
@@ -271,6 +315,8 @@ int main (int argc, char **argv) {
       ax_select_menu_option(app, id);
       CFRelease(app);
     } else ax_select_menu_extra(argv[2]);
+  } else if (argc == 3 && strcmp(argv[1], "-b") == 0) {
+    ax_select_app_menu_extra(argv[2]);
   }
   return 0;
 }
