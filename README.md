@@ -37,8 +37,8 @@ alone, and any file a link would replace is moved to
 | `herdr`      | on  | herdr, a terminal multiplexer for AI coding agents, and its `config.toml` |
 | `ghostty`    | on  | Ghostty and JetBrains Mono Nerd Font |
 | `aerospace`  | on  | AeroSpace tiling window manager and JankyBorders |
-| `sketchybar` | on  | SketchyBar (Lua) with SbarLua, SF Pro / SF Symbols fonts, and the tools its widgets call |
 | `raycast`    | on  | Raycast (the app only; its settings are not synced) |
+| `sketchybar` | off | SketchyBar (Lua) with SbarLua, SF Pro / SF Symbols fonts, and the tools its widgets call |
 | `macos`      | off | Dock autohide, Finder path and status bars, fast key repeat |
 | `brave`      | off | Brave profile launchers that AeroSpace can tile (needs Brave) |
 | `rift`       | off | rift, a scrolling (niri-style) window manager, and `wm` to switch between it and AeroSpace |
@@ -47,7 +47,7 @@ alone, and any file a link would replace is moved to
 ## After installing
 
 - **AeroSpace:** allow it in System Settings → Privacy & Security → Accessibility.
-- **SketchyBar:** allow `CoreLocationCLI` in Privacy & Security → Location Services
+- **sketchybar component:** allow `CoreLocationCLI` in Privacy & Security → Location Services
   for the prayer-times and weather widgets. If it is not listed, run
   `CoreLocationCLI --json` once to get the prompt.
 - **macos component:** log out and back in for the key repeat change.

@@ -57,5 +57,5 @@ case "$1" in
 esac
 # The bar picks its workspace widget at load (items/init.lua), so reload it
 # whenever the window manager changes.
-[ -n "$1" ] && sketchybar --reload
+[ -n "$1" ] && command -v sketchybar >/dev/null && sketchybar --reload
 status
